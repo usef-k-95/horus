@@ -166,7 +166,7 @@ async def test_full_interview_against_fake_meetstream(tmp_path, fast_pacing):
     assert body["video_required"] is False and body["audio_required"] is True
     assert body["live_transcription_required"]["webhook_url"].endswith(f"/ms/{ingress.token}/transcript")
     assert body["socket_connection_url"]["websocket_url"].startswith("ws://") and body["callback_url"].endswith("/callback")
-    assert "deepgram_streaming" in body["recording_config"]["transcript"]["provider"]
+    assert body["recording_config"]["transcript"]["provider"] == {"meetstream_streaming": {}}
     assert body["automatic_leave"]["waiting_room_timeout"] == 60 * 0 + 60 if False else body["automatic_leave"]["waiting_room_timeout"] >= 60
     assert body["bot_message"].startswith("Horus AI")
     # the bot spoke through the control socket and posted the disclosure to chat
@@ -189,4 +189,28 @@ async def test_play_audio_rejects_non_pcm():
     bot = MeetStreamBotAdapter("ms_test", ingress, "http://127.0.0.1:1", client=httpx.AsyncClient(transport=httpx.MockTransport(lambda r: httpx.Response(404))))
     with pytest.raises(ms.MeetStreamError):
         await bot.play_audio(AudioClip(data=b"abc", mime="audio/mpeg"))
+    await bot.close()
+
+
+@pytest.mark.asyncio
+async def test_native_raw_chunks_close_the_turn_on_end_of_turn():
+    """MeetStream's own live transcription sends raw chunks: interim ones with is_final false, and a
+    turn end that may arrive without is_final. The adapter must still close the utterance and the turn."""
+    from horus_meet.adapters.meetstream import Ingress, MeetStreamBotAdapter, TRANSCRIPT_PRESETS
+    from horus_meet.models import SpeechEvent, Utterance
+
+    assert TRANSCRIPT_PRESETS["meetstream_native"] == {"meetstream_streaming": {}}
+    bot = MeetStreamBotAdapter("ms_test", Ingress(port=free_port()), "https://example.test")
+    assert bot.transcript_preset == "meetstream_native"
+    base = {"bot_id": "b1", "speakerName": "Alice", "timestamp": "2026-10-26T07:00:00Z", "transcription_mode": "raw", "words": []}
+    await bot.on_transcript({**base, "transcript": "Can you walk me", "is_final": False, "end_of_turn": False})
+    await bot.on_transcript({**base, "transcript": "through the pilot", "is_final": False, "end_of_turn": True})
+    events = []
+    while not bot._queue.empty():
+        events.append(bot._queue.get_nowait())
+    utterances = [e for e in events if isinstance(e, Utterance)]
+    assert [u.is_final for u in utterances] == [False, True]
+    assert utterances[1].speaker.name == "Alice"
+    speech = [e for e in events if isinstance(e, SpeechEvent)]
+    assert speech[-1].speaking is False  # the turn closed
     await bot.close()

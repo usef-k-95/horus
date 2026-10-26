@@ -121,13 +121,20 @@ class MeetingSession:
         bot_id = await self.bot.join(meeting_url, self.report.bot_name)
         self._log("join_requested", bot_id=bot_id, meeting_url=meeting_url)
         self._pump = asyncio.create_task(self._pump_events())
-        try:
-            await asyncio.wait_for(self._joined.wait(), timeout=grace_s * self.scale)
-        except asyncio.TimeoutError:
-            self._log("not_admitted", grace_s=grace_s)
+        joined = asyncio.create_task(self._joined.wait())
+        ended = asyncio.create_task(self._ended.wait())
+        done, pending = await asyncio.wait({joined, ended}, timeout=grace_s * self.scale, return_when=asyncio.FIRST_COMPLETED)
+        for task in pending:
+            task.cancel()
+        if joined in done:
+            self.report.admitted_at = self.clock()
+            return True
+        if ended in done:
+            # the provider gave up before anyone admitted the bot (invalid link, denied, failed): stop waiting now
+            self._log("join_failed", state=self.state.value)
             return False
-        self.report.admitted_at = self.clock()
-        return True
+        self._log("not_admitted", grace_s=grace_s)
+        return False
 
     async def _pump_events(self) -> None:
         try:
@@ -283,6 +290,8 @@ class MeetingSession:
             self.report.errors.append(f"closing: {exc!r}")
         try:
             await self.bot.leave()
+            if self.report.admitted_at is None and getattr(self.bot, "bot_id", "n/a") is None:
+                self._ended.set()  # the provider never created a bot (for example create_bot failed): nothing to wait for
             await asyncio.wait_for(self._ended.wait(), timeout=15 * self.scale)
         except asyncio.TimeoutError:
             self.report.errors.append("provider did not confirm the bot left within 15 s")

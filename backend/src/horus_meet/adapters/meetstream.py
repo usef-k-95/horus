@@ -74,9 +74,27 @@ BOT_EVENT_MAP = {  # callback_url webhook `bot_event`
     "bot.notallowed": BotState.aborted,
     "bot.failed": BotState.aborted,
 }
+def _seconds(value, default: float = 0.0) -> float:
+    """Seconds from a number, a numeric string or an ISO-8601 timestamp (MeetStream sends ISO strings)."""
+    if value is None:
+        return default
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        pass
+    try:
+        from datetime import datetime
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00")).timestamp()
+    except ValueError:
+        return default
+
+
 TRANSCRIPT_PRESETS = {
     "deepgram_sentence": {"deepgram_streaming": {"model": "nova-2", "transcription_mode": "sentence", "language": "en", "punctuate": True, "smart_format": True, "endpointing": 300, "utterance_end_ms": 1000}},
-    "meetstream_sentence": {"meetstream_streaming": {"transcription_mode": "sentence"}},
+    # MeetStream's own live transcription: free on every account, no external key; chunks arrive in "raw" mode
+    # with is_final/end_of_turn flags and the speaker's meeting name.
+    "meetstream_native": {"meetstream_streaming": {}},
+    "meetstream_sentence": {"meetstream_streaming": {}},
     "assemblyai_sentence": {"assemblyai_streaming": {"transcription_mode": "sentence"}},
     "meeting_captions": {"meeting_captions": {}},
 }
@@ -147,7 +165,17 @@ class Ingress:
     async def start(self) -> None:
         if self._task is not None:
             return
+        import socket
         import uvicorn
+
+        probe = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            probe.bind((self.host, self.port))
+        except OSError as exc:
+            raise MeetStreamError(f"port {self.port} is already in use: another Horus meeting or live test is still running on this Mac. Finish it (say goodbye, or press Control+C in its Terminal tab) and try again.") from exc
+        finally:
+            probe.close()
 
         config = uvicorn.Config(self.app, host=self.host, port=self.port, log_level="warning", lifespan="off")
         self._server = uvicorn.Server(config)
@@ -239,7 +267,7 @@ class MeetStreamBotAdapter:
         public_base_url: str,
         *,
         api_base: str = API_BASE,
-        transcript_preset: str = "deepgram_sentence",
+        transcript_preset: str = "meetstream_native",
         waiting_room_timeout_s: int = 300,
         bot_message: Optional[str] = None,
         custom_attributes: Optional[dict] = None,
@@ -374,12 +402,15 @@ class MeetStreamBotAdapter:
             return
         speaker = Speaker(id=str(payload.get("speakerId") or payload.get("speaker_id") or payload.get("speakerName") or "unknown"), name=payload.get("speakerName") or payload.get("speaker_name"))
         words = payload.get("words") or []
-        start = float(words[0].get("start", 0.0)) if words else float(payload.get("timestamp") or 0.0)
-        end = float(words[-1].get("end", start)) if words else start
+        start = _seconds(words[0].get("start")) if words else _seconds(payload.get("timestamp"))
+        end = _seconds(words[-1].get("end"), start) if words else start
         is_final = bool(payload.get("is_final", True))
+        end_of_turn = bool(payload.get("end_of_turn", is_final))
+        if end_of_turn:
+            is_final = True  # a turn end always closes the utterance, whatever the provider's final flag says
         await self._queue.put(SpeechEvent(speaker=speaker, speaking=True))
         await self._queue.put(Utterance(speaker=speaker, text=text, start=start, end=end, is_final=is_final, confidence=payload.get("end_of_turn_confidence")))
-        if payload.get("end_of_turn", True) and is_final:
+        if end_of_turn:
             await self._queue.put(SpeechEvent(speaker=speaker, speaking=False))
 
     async def on_control_connected(self, websocket: WebSocket) -> None:

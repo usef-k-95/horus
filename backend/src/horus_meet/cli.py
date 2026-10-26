@@ -116,7 +116,7 @@ def spike(
                 ingress,
                 settings.public_base_url,
                 api_base=settings.meetstream_api_base,
-                transcript_preset=transcript or "deepgram_sentence",
+                transcript_preset=transcript or settings.transcript_preset,
                 waiting_room_timeout_s=int(min(grace_s, 600)),
                 bot_message=DISCLOSURE_CHAT,
                 custom_attributes={"meeting_id": meeting_id},

@@ -10,7 +10,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Callable, Optional
 
-from .models import ControlKind, SpikeReport, Turn
+from .models import ControlKind, SpikeReport, Turn, BotState
 from .session import MeetingSession
 
 DEFAULT_DISCLOSURE = (
@@ -111,8 +111,14 @@ async def run_spike(cfg: SpikeConfig, session: MeetingSession) -> SpikeReport:
     try:
         admitted = await session.start(cfg.meeting_url, cfg.grace_s)
         if not admitted:
-            report.outcome = "not_admitted"
-            report.errors.append(f"bot was not admitted within {cfg.grace_s:.0f} s")
+            if session.state == BotState.aborted:
+                last = report.states[-1] if report.states else None
+                detail = (last.get("detail") if isinstance(last, dict) else getattr(last, "detail", None)) or "the provider reported a failure"
+                report.outcome = "error"
+                report.errors.append(f"bot could not join: {detail}")
+            else:
+                report.outcome = "not_admitted"
+                report.errors.append(f"bot was not admitted within {cfg.grace_s:.0f} s")
             await session.leave(None)
             session.write_report()
             return report

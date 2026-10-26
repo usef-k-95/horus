@@ -16,6 +16,13 @@ from .service import Service
 from .views import VIEWS, render
 
 app = typer.Typer(help="Horus engagement state: Supervisor console, views, validation, maintenance.", no_args_is_help=True)
+
+
+@app.callback()
+def _main(workspace: Optional[Path] = typer.Option(None, "--workspace", "-w", help="Engagement folder (default: current directory or $HORUS_WORKSPACE)")) -> None:
+    """Horus engagement state console."""
+    if workspace is not None:
+        os.environ["HORUS_WORKSPACE"] = str(Path(workspace).resolve())
 meet_app = typer.Typer(help="Live-meeting controls (forwarded to the horus-meet runtime's control channel).")
 settings_app = typer.Typer(help="Engagement settings.")
 schema_app = typer.Typer(help="Schema utilities.")

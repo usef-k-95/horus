@@ -36,6 +36,7 @@ class Settings:
     elevenlabs_voice_id: Optional[str] = None
     elevenlabs_model_id: str = "eleven_flash_v2_5"
     bot_name: str = "Horus AI (recording)"
+    transcript_preset: str = "meetstream_native"
     env_file: Optional[Path] = field(default=None, repr=False)
 
     @classmethod
@@ -58,6 +59,7 @@ class Settings:
             elevenlabs_voice_id=os.getenv("ELEVENLABS_VOICE_ID") or None,
             elevenlabs_model_id=os.getenv("ELEVENLABS_MODEL_ID", "eleven_flash_v2_5"),
             bot_name=os.getenv("HORUS_BOT_NAME", "Horus AI (recording)"),
+            transcript_preset=os.getenv("HORUS_MEET_TRANSCRIPT", "meetstream_native"),
             env_file=env_file,
         )
 
@@ -104,4 +106,5 @@ class Settings:
             "ELEVENLABS_VOICE_ID": self.elevenlabs_voice_id or "(not set)",
             "ELEVENLABS_MODEL_ID": self.elevenlabs_model_id,
             "HORUS_BOT_NAME": self.bot_name,
+            "HORUS_MEET_TRANSCRIPT": self.transcript_preset,
         }

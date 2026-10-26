@@ -1,0 +1,8 @@
+{
+  "name": "horus-local",
+  "owner": { "name": "Horus" },
+  "metadata": { "description": "Local marketplace for the Horus plugin on this machine" },
+  "plugins": [
+    { "name": "horus", "source": "./plugin", "description": "Horus AI-native policy advisory: Principal, workers, live meetings, engagement state." }
+  ]
+}

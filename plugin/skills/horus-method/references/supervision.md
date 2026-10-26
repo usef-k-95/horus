@@ -27,6 +27,10 @@ Read the live values with `get engagement` (`settings.autonomy.levels`). Only a 
 4. A rejection carries a note: act on it, then request again. Approvals are immutable once decided; a changed draft needs a new request.
 5. Never bypass: the outbound guard asks the Supervisor on every send; the runtime refuses to join without an approved plan; `release_version` and `set_gate` check approvals themselves.
 
+## Approvals given in chat
+
+A Supervisor who is not at the console can approve in the conversation. When the Supervisor writes words that clearly approve a specific pending item ("yes, send it", "approved", "go ahead with the kickoff email"), call `decide_approval` on that approval with `actor: "supervisor:<their name>"` and put their words in the note. Never infer approval from silence, from a general "looks good", or from an earlier approval of something else; when in doubt, ask which item they mean. Rejections work the same way with the reason in the note.
+
 ## Interventions during live meetings
 
 The Supervisor can `whisper`, `pause`, `resume`, `takeover` or `leave` from the console (`horus meet …`). The interviewer receives them in `listen` results and obeys at once; every intervention is written to the meeting's `live.supervisor_interventions` and to the event log.

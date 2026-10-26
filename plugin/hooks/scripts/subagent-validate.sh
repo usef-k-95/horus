@@ -3,7 +3,7 @@
 WORKSPACE="${CLAUDE_PROJECT_DIR:-$PWD}"
 [ -f "$WORKSPACE/.horus/engagement.yaml" ] || exit 0
 . "$(dirname "$0")/../../scripts/backend-env.sh" 2>/dev/null || exit 0
-ISSUES="$("$BACKEND/uvw" run --no-sync horus --workspace "$WORKSPACE" validate 2>/dev/null | grep -E '^\[(error|warning)\]' | head -8 | tr '\n' ' ')"
+ISSUES="$(HORUS_WORKSPACE="$WORKSPACE" "$BACKEND/uvw" run --no-sync horus validate 2>/dev/null | grep -E '^\[(error|warning)\]' | head -8 | tr '\n' ' ')"
 python3 - "$ISSUES" <<'PY'
 import json, sys
 issues = sys.argv[1].strip()

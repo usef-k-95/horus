@@ -7,7 +7,7 @@ APPROVED=""
 if [ -f "$WORKSPACE/.horus/engagement.yaml" ]; then
   . "$(dirname "$0")/../../scripts/backend-env.sh" 2>/dev/null
   if [ -n "$BACKEND" ]; then
-    APPROVED="$("$BACKEND/uvw" run --no-sync horus --workspace "$WORKSPACE" list communications --filter '{"status":"approved","direction":"outbound"}' 2>/dev/null | head -5 | tr '\n' ';')"
+    APPROVED="$(HORUS_WORKSPACE="$WORKSPACE" "$BACKEND/uvw" run --no-sync horus list communications --filter '{"status":"approved","direction":"outbound"}' 2>/dev/null | head -5 | tr '\n' ';')"
   fi
 fi
 python3 - "$APPROVED" <<'PY'

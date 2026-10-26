@@ -77,7 +77,7 @@ async def _build(meeting_id: str, chat_text: Optional[str]) -> tuple[BotAdapter,
         if _ingress is None:
             _ingress = Ingress(port=cfg.local_port)
         tts = ElevenLabsTTS(cfg.elevenlabs_api_key, cfg.elevenlabs_voice_id, model_id=cfg.elevenlabs_model_id, output_format=cfg.elevenlabs_output_format)
-        bot = MeetStreamBotAdapter(cfg.meetstream_api_key, _ingress, cfg.public_base_url, api_base=cfg.meetstream_api_base, bot_message=chat_text or DISCLOSURE_CHAT, custom_attributes={"meeting_id": meeting_id})
+        bot = MeetStreamBotAdapter(cfg.meetstream_api_key, _ingress, cfg.public_base_url, api_base=cfg.meetstream_api_base, transcript_preset=cfg.transcript_preset, bot_message=chat_text or DISCLOSURE_CHAT, custom_attributes={"meeting_id": meeting_id})
         return bot, tts, _ingress
     if provider == "recall":
         from .adapters.recall import RecallBotAdapter
