@@ -1,0 +1,10 @@
+#!/bin/sh
+# uv wrapper for this project: keeps the virtual environment outside iCloud-synced folders
+# (this repository lives under ~/Desktop, which iCloud Drive syncs and where it mangles symlinks
+# and deletes files inside .venv). Usage: ./uvw sync --extra dev ; ./uvw run pytest ; ./uvw run horus-meet ...
+set -e
+HERE="$(cd "$(dirname "$0")" && pwd)"
+export UV_PROJECT_ENVIRONMENT="${UV_PROJECT_ENVIRONMENT:-$HOME/Library/Caches/horus/backend-venv}"
+if command -v uv >/dev/null 2>&1; then UV=uv; elif [ -x "$HOME/Library/Python/3.9/bin/uv" ]; then UV="$HOME/Library/Python/3.9/bin/uv"; elif [ -x "$HOME/.local/bin/uv" ]; then UV="$HOME/.local/bin/uv"; else echo "uv not found; install with: python3 -m pip install --user uv" >&2; exit 127; fi
+cd "$HERE"
+exec "$UV" "$@"

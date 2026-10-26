@@ -1,0 +1,49 @@
+# Decision log
+
+Decisions on the architecture (ARCHITECTURE.md §13), accepted by the Supervisor on 25 October 2026 with the instruction to use the Principal's recommendations unless stated otherwise. Each entry is open to revision; a revision adds a dated line rather than editing the original.
+
+| # | Decision | Accepted value | Notes |
+|---|---|---|---|
+| 1 | Backend stack | Python 3.12 managed with `uv`; one YAML file per record under `.horus/`; append-only JSON Lines event log; derived SQLite index | Single `backend/` project with two packages, `horus_state` and `horus_meet` |
+| 2 | Models | Principal: Fable 5.1 or Opus 5.5 as the Supervisor runs it. `researcher`: Sonnet 5.5, Opus 5.5 for decision-maker and client-entity profiles. `analyst`, `producer`: Opus 5.5. `interviewer`: Sonnet 5.5 for the live loop, Opus 5.5 for the debrief | Agent frontmatter uses `sonnet` and `opus` aliases |
+| 3 | Email | Gmail connector first; attachment download verified in build step 1; custom Gmail MCP only if the connector cannot fetch attachments | |
+| 4 | Autonomy defaults | The default profile in ARCHITECTURE.md §3.1; shadow profile as the second preset | Interview plans, client emails, Tier 0 and Tier 1 releases and gate transitions at `approve` |
+| 5 | Workspace | One folder per engagement under `~/Horus/engagements/<ENG-CODE>/`, each a git repository; `checkpoint` commits automatically | Location can be changed per machine through `HORUS_ENGAGEMENTS_DIR` |
+| 6 | Profiles | Kept in the engagement state at `sensitive-personal`, filtered from all client-facing outputs; deleted at engagement close unless the Supervisor retains them | |
+| 7 | Brand | Neutral design system and a neutral professional voice first; brand assets swapped in when provided | |
+| 8 | Languages | English in the MVP; speech and template adapters chosen so that Arabic (right-to-left documents, Arabic speech) and French can be added without redesign | |
+| 9 | Fixture engagement | National SME digitalisation and e-invoicing brief for a middle-income country, classifying as strategy with a regulatory secondary pathway | Exercises two pathway packs and the hybrid logic |
+| 10 | Research budget caps | Defaults per phase in `engagement.settings.research_budget`: P0 2 runs; P1 4; P2 12; P3 4; P4 6; P5 2; 40 fetches per run | Adjustable per engagement |
+| 11 | Slash entry name | `/horus:horus-method <verb>` | Alias revisited after first use |
+| 12 | Meeting providers | **Revised 26 Oct 2026 by the Supervisor: MeetStream** as the bot provider (Google Meet first; Zoom when the client hosts, which needs the firm's Zoom General app registered in MeetStream), Deepgram streaming transcription through MeetStream, ElevenLabs text-to-speech as PCM resampled to 48 kHz; Recall.ai kept as an alternative adapter; MeetStream's hosted agents (MIA) as the latency fallback | The MeetStream Claude plugin `meetstream-ai-meeting-bot-api@anthropic-plugin-directory` is installed at user scope |
+| 13 | Who conducts | The `interviewer` worker conducts stakeholder interviews; the Principal co-leads gate meetings with the Supervisor | |
+| 14 | Consent and retention | Audio deleted after transcript verification; transcripts retained at `client-confidential`; off-record segments removed from stored transcripts | |
+| 15 | Pathway depth | All six packs in light form; regulatory and strategy in depth for the fixture | |
+| 16 | Email path | Gmail connector for reading and sending; `horus-mail` over IMAP and SMTP with a Google app password for attachments, invites and large files, because the connector does not return attachment content | Supervisor creates the app password; never the account password |
+| 17 | Scheduling | Email-based (propose slots, read replies, parse invites, join at the time) with `meeting_scheduling` at `approve`; optional MeetStream Google Calendar auto-join; Horus does not create calendar events | |
+| 18 | Scope of step 0 after the second review | Step 0 now includes the Stakeholder Interviewer end to end: MeetStream runtime, `interviewer` agent, state write-back, scheduling and capture protocols; the remaining steps proceed without further check-ins | Instruction from the Supervisor on 26 Oct 2026 |
+
+## Build step 0 — meeting spike (started 25 October 2026)
+
+Goal: a bot joins a test Zoom and a test Google Meet from a link, discloses itself, confirms consent, hears a human, replies by voice, and leaves; end-to-end latency measured. Success: two-way audio on both platforms with pipeline latency (end of the human's turn to first Horus audio, excluding the model) under 1.5 seconds median, leaving room for the model inside the 3-second target; or the fallback design chosen with evidence.
+
+Interim findings (25 October 2026), from vendor documentation rather than measurement:
+
+| Finding | Consequence for the design |
+|---|---|
+| Recall.ai's final transcript segments arrive one to three seconds after an utterance ends; Recall recommends speech-to-speech models for conversational bots | The runtime closes turns on voice-activity events with partial text (a "provisional turn") and reconciles the final transcript afterwards, so the reply does not wait for finalisation; the spike measures the resulting lag separately |
+| Recall's Output Audio is a short-snippet MP3 path with undocumented playback latency; Output Media (a bot-run webpage streaming audio) adds under 50 ms but forces video on and excludes Output Audio | The spike measures snippets first; if playback start is slow, the next iteration implements Output Media with a placeholder video frame |
+| Zoom bots currently join from the link without a customer Zoom SDK app, but Zoom's bot policy changed in 2026 | Runbook step 2 revised; confirm with Recall support in writing before the first client interview on Zoom |
+| Google Meet admits anonymous bots only through a host-Workspace participant; knocking must be enabled | For client interviews the PM or the stakeholder's host must admit Horus; a signed-in bot account is a Phase 2 option |
+| Meeting BaaS and Attendee both offer bidirectional streaming audio over websocket | Kept as verified fallbacks if Recall's audio output disappoints |
+| Deepgram Flux offers about 260 ms end-of-turn detection on raw audio | The direct speech-to-text path (raw 16 kHz audio from the bot to Deepgram) is the latency fallback inside Recall |
+| Google Meet Media API and Zoom RTMS are receive-only | Platform-native integration cannot replace the bot provider for speaking; it remains a Phase 2 option for capture only |
+
+Status at the end of the Principal's work on 25 October 2026: the runtime is built and verified against the mock provider (17 tests; fast and natural-speed mock runs produce complete reports; consent decline, non-admission, Supervisor leave and whisper paths exercised). The real Zoom and Google Meet runs wait on the Supervisor's accounts, tunnel and test meetings (runbook `docs/SPIKE-0-live-meetings.md` §3). The step-0 decision is open until those reports exist.
+
+## Build log
+
+- 25 Oct 2026: step 0 spike built against Recall.ai with a mock provider; 17 tests.
+- 26 Oct 2026: provider switched to MeetStream; `horus_meet` rebuilt (ingress, bridge websocket speaking, transcript webhooks, state bridge, MCP server); `horus_state` backend built (23 record types, rules, approvals, gates, views, MCP server, `horus` console); `horus_mail` and `horus_appraisal` built; plugin skeleton (manifest, MCP launchers, hooks, four skills, four agents); MeetStream Claude plugin installed. Real meeting runs still need the Supervisor's MeetStream, ElevenLabs and tunnel setup (docs/SPIKE-0-live-meetings.md).
+- 26 Oct 2026 (later): plugin validated (`claude plugin validate --strict` passes); end-to-end dry run test of an interview from approved plan through the mock provider into state; storyboard lint aligned to the storyboard format; `decision_brief` deliverable type and `meeting_scheduling` action class adopted; server rule added so an interview, speech or social-media source counts as Tier A for a position or quote and at most Tier C for an asserted fact; snapshot script gained fetch and finalise modes; skill descriptions kept within Claude Code's 1,536-character listing budget. Content written by subagents so far: deliverables references (7 files), phase playbooks (7), evidence references (8); frameworks catalogue, pathway packs and appraisal references in progress. The desktop app's bundled `claude` is not logged in for non-interactive use, so `claude plugin eval` must run from the Supervisor's terminal.
+- 26 Oct 2026 (close of the autonomous build run): all content delivered. Frameworks catalogue (51 frameworks plus index), six pathway packs with index and classification procedure, seven phase playbooks, eight evidence references, eleven policy references (six appraisal methods, option design, guiding principles, feasibility, implementation and communication planning), seven deliverables references. Adopted from the agents' proposals: deliverable types `decision_brief`, `legal_change_inventory`, `routines_design`, `capability_plan`, `cost_to_serve_summary`; action class `meeting_scheduling`; the interview-grading rule; `research_memo` content shape. Deferred: machine-readable hybrid pathway components (`engagement.pathway.secondary[]` as objects) and a controlled vocabulary for `standards_applied`. Open items for the Supervisor: provider accounts and tunnel for live meetings, mail app password, Zoom app if clients host on Zoom, running `claude plugin eval` from a logged-in terminal, Green Book 2026 discount schedule and optimism-bias tables to confirm before a final appraisal, benchmark entries for the non-regulatory pathways, and git initialisation of the repository.

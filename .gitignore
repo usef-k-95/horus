@@ -1,0 +1,18 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+backend/.venv*
+backend/spike-runs/
+*.sqlite
+
+# secrets: never commit environment files
+.env
+backend/.env
+*.env.local
+
+# engagement workspaces created for tests or demos
+/engagements/

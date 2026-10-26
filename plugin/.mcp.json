@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "horus-state": {
+      "command": "${CLAUDE_PLUGIN_ROOT}/scripts/horus-state.sh",
+      "args": [],
+      "env": { "HORUS_WORKSPACE": "${CLAUDE_PROJECT_DIR}" }
+    },
+    "horus-meet": {
+      "command": "${CLAUDE_PLUGIN_ROOT}/scripts/horus-meet-mcp.sh",
+      "args": [],
+      "env": { "HORUS_WORKSPACE": "${CLAUDE_PROJECT_DIR}" }
+    }
+  }
+}

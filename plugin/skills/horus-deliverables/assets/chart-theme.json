@@ -1,0 +1,6 @@
+{
+  "name": "horus-neutral-v1",
+  "font": "Helvetica, Arial, sans-serif",
+  "colors": { "primary": "#1F3A5F", "highlight": "#C8553D", "grey": "#8A8F98", "text": "#1A1A1A", "background": "#FFFFFF", "positive": "#2E7D5B", "negative": "#B23A3A" },
+  "rules": ["one highlight colour per chart", "direct labels, no legends where avoidable", "no 3D, no gradients", "source line on every exhibit", "units in axis titles", "minimum 11 pt labels in decks, 14 pt at Tier 0"]
+}

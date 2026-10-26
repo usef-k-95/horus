@@ -1,0 +1,18 @@
+{
+  "name": "horus",
+  "version": "0.1.0",
+  "description": "Horus: an AI-native policy advisory firm as a Claude Code plugin. One Principal executes engagements end to end under a human Supervisor: intake, pathway selection, research, live stakeholder interviews, options, appraisal, recommendation, implementation and communication plans, with MBB-grade deliverables.",
+  "author": {
+    "name": "Horus"
+  },
+  "keywords": [
+    "policy",
+    "advisory",
+    "government",
+    "consulting",
+    "meetings",
+    "regulatory-impact-assessment"
+  ],
+  "license": "LicenseRef-Horus-Proprietary",
+  "icon": ".claude-plugin/icon.png"
+}
