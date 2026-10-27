@@ -149,13 +149,13 @@ If Horus ever seems not to know it is Horus, type `/horus:horus-method` and pres
 
 ### C1. Start a real engagement
 
-Choose a short code for the project: letters, country, year, a number, for example `EGY-2026-001`. Have the RFP or terms of reference as a file. Edit the four values and the file path, then press Run:
+Press Run, then click into the Terminal panel. It asks five questions: a short code for the project (for example the country, the year and a number), the engagement name, the client entity, the country as a three-letter code, and the RFP file. For the file, drag it from Finder into the Terminal panel and press Enter, or press Enter to add it later. It shows you the details and creates the engagement only after you answer "y".
 
 ```bash
-~/Horus/new-engagement EGY-2026-001 "SME e-invoicing policy" "Ministry of Finance" EGY ~/Downloads/rfp.pdf
+~/Horus/new-engagement
 ```
 
-This creates the folder `Horus/engagements/EGY-2026-001` in your home folder, with the RFP in its `inbox`. You can also drop files into that `inbox` folder later and tell Horus they are there.
+This creates the folder `Horus/engagements/<code>` in your home folder, with an `inbox` folder for the RFP and any other client documents. If you did not give the RFP, the inbox opens in Finder so you can drop the file in. You can drop more files there later and tell Horus they are there.
 
 ### C2. Open the engagement in the Claude app
 
