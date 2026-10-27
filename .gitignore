@@ -16,3 +16,4 @@ backend/.env
 
 # engagement workspaces created for tests or demos
 /engagements/
+web/dist/

@@ -1,0 +1,519 @@
+<title>Horus Brand Manual</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira:wdth,wght@50..125,100..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout concept: a numbered manual set like an engineering document. One wide column of reading text,
+   full-width plates for the mark, hairline rules as the only ornament, obsidian ground, gold reserved for the mark and key lines. */
+:root {
+  --bg: #0A0B0D; --surface: #121418; --line: #1C1F25; --line-2: #2A2E36;
+  --fg: #D6D8DD; --fg-2: #9DA3AD; --fg-3: #6B7280;
+  --gold: #C9A24A; --gold-deep: #9A7A2F; --gold-pale: #E8D7A4; --lapis: #3A6BFF;
+  --good: #3DA66B; --warn: #D08A2A; --critical: #C8453A;
+  --font-display: "Saira", "Archivo", Helvetica, Arial, sans-serif;
+  --font-text: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-data: "IBM Plex Mono", "SF Mono", Menlo, Consolas, monospace;
+  --ease: cubic-bezier(.2,.7,.2,1);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #F2F3F5; --surface: #FFFFFF; --line: #D9DCE2; --line-2: #C3C7CF;
+    --fg: #111318; --fg-2: #4B5160; --fg-3: #6B7280;
+    --gold: #9A7A2F; --gold-deep: #7A5F22; --gold-pale: #C9A24A; --lapis: #2E54D6;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #F2F3F5; --surface: #FFFFFF; --line: #D9DCE2; --line-2: #C3C7CF;
+  --fg: #111318; --fg-2: #4B5160; --fg-3: #6B7280;
+  --gold: #9A7A2F; --gold-deep: #7A5F22; --gold-pale: #C9A24A; --lapis: #2E54D6;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-text); font-size: 17px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0; }
+.wrap { max-width: 1080px; margin: 0 auto; }
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height: 1.1; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(40px, 7vw, 88px); font-stretch: 125%; letter-spacing: .18em; text-transform: uppercase; }
+h2 { font-size: clamp(26px, 3.4vw, 40px); font-stretch: 112%; letter-spacing: .02em; }
+h3 { font-size: 20px; font-stretch: 100%; letter-spacing: .01em; }
+h4 { font-size: 15px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; color: var(--fg-2); }
+p { margin: 0 0 1em; max-width: 68ch; }
+a { color: var(--gold); text-decoration: none; border-bottom: 1px solid var(--line-2); }
+a:hover { border-bottom-color: var(--gold); }
+code, .data { font-family: var(--font-data); font-size: .86em; }
+.num { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.cover { padding: clamp(56px, 10vh, 120px) 0 48px; border-bottom: 1px solid var(--line); display: grid; gap: 28px; }
+.cover .mark { width: clamp(120px, 22vw, 220px); color: var(--gold); }
+.cover .meta { display: flex; flex-wrap: wrap; gap: 8px 32px; color: var(--fg-2); font-family: var(--font-display); font-size: 14px; letter-spacing: .06em; text-transform: uppercase; }
+.toc { padding: 32px 0; border-bottom: 1px solid var(--line); columns: 2; column-gap: 48px; font-family: var(--font-display); font-size: 15px; }
+.toc a { display: block; padding: 6px 0; border: 0; color: var(--fg); border-bottom: 1px solid var(--line); break-inside: avoid; }
+.toc a span { color: var(--fg-3); font-family: var(--font-data); margin-right: 12px; }
+section { padding: 64px 0; border-bottom: 1px solid var(--line); }
+.section-head { display: grid; grid-template-columns: 72px 1fr; gap: 16px; align-items: baseline; margin-bottom: 28px; }
+.section-head .n { font-family: var(--font-data); color: var(--gold); font-size: 14px; letter-spacing: .08em; }
+.lead { font-size: 21px; line-height: 1.5; color: var(--fg); max-width: 60ch; }
+.grid { display: grid; gap: 24px; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.g4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.plate { background: var(--surface); border: 1px solid var(--line); padding: 24px; display: grid; gap: 14px; min-width: 0; }
+.plate .cap { font-family: var(--font-display); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--fg-2); }
+.plate .cap b { color: var(--fg); font-weight: 500; }
+.plate svg { width: 100%; height: auto; display: block; }
+.plate.dark { background: #0A0B0D; color: #C9A24A; }
+.plate.light { background: #F2F3F5; color: #111318; }
+.plate.gold { background: #C9A24A; color: #0A0B0D; }
+.plate.dark .cap { color: #9DA3AD; } .plate.dark .cap b { color: #D6D8DD; }
+.plate.light .cap { color: #4B5160; } .plate.light .cap b { color: #111318; }
+.plate.gold .cap { color: #3A3010; } .plate.gold .cap b { color: #0A0B0D; }
+.art { color: var(--gold); }
+.row { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end; }
+table { border-collapse: collapse; width: 100%; font-family: var(--font-display); font-size: 15px; }
+th, td { text-align: left; padding: 10px 12px 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 500; color: var(--fg-2); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; }
+td.data, th.data { font-family: var(--font-data); font-size: 13px; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.sw { border: 1px solid var(--line); min-width: 0; }
+.sw .chip { height: 84px; }
+.sw .lbl { padding: 10px 12px; font-family: var(--font-display); font-size: 13px; display: grid; gap: 2px; }
+.sw .lbl b { font-weight: 500; }
+.sw .lbl code { color: var(--fg-2); }
+.spec { display: grid; gap: 6px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+.spec .d { font-family: var(--font-display); }
+.spec small { font-family: var(--font-data); color: var(--fg-3); font-size: 12px; }
+.dont { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
+.dont .plate { position: relative; }
+.dont .plate::after { content: ""; position: absolute; inset: 12px; border: 1px solid var(--critical); pointer-events: none; opacity: .7; }
+.dont .plate .cap { color: var(--critical); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+@media (max-width: 720px) { .two { grid-template-columns: 1fr; } .toc { columns: 1; } .section-head { grid-template-columns: 1fr; gap: 4px; } }
+.mock { background: #0A0B0D; color: #D6D8DD; border: 1px solid var(--line-2); position: relative; min-width: 0; overflow: hidden; }
+.mock.slide { aspect-ratio: 16 / 9; padding: 5% 6%; display: grid; grid-template-rows: auto 1fr auto; font-family: var(--font-display); }
+.mock.slide .title { font-size: clamp(14px, 2.6vw, 28px); font-weight: 500; font-stretch: 106%; letter-spacing: .01em; text-wrap: balance; max-width: 26ch; }
+.mock.slide .body { align-self: center; display: grid; grid-template-columns: 1fr 1fr; gap: 6%; font-size: clamp(9px, 1.3vw, 13px); color: #9DA3AD; }
+.mock.slide .bars { display: grid; grid-template-columns: repeat(6, 1fr); align-items: end; gap: 6%; height: 100%; min-height: 60px; }
+.mock.slide .bars i { display: block; background: #4B5160; }
+.mock.slide .bars i.k { background: #C9A24A; }
+.mock.slide .foot { display: flex; justify-content: space-between; align-items: flex-end; font-size: clamp(8px, 1vw, 11px); color: #6B7280; }
+.mock.slide .foot svg { width: clamp(28px, 5vw, 44px); color: #C9A24A; }
+.mock.note { background: #F7F7F5; color: #111318; aspect-ratio: 1 / 1.3; padding: 7% 8%; font-family: var(--font-text); display: grid; grid-template-rows: auto auto 1fr auto; gap: 4%; font-size: clamp(8px, 1.2vw, 12px); }
+.mock.note .k { font-family: var(--font-display); font-size: .9em; letter-spacing: .08em; text-transform: uppercase; color: #4B5160; display: flex; justify-content: space-between; }
+.mock.note h5 { font-family: var(--font-display); font-weight: 600; font-size: 1.8em; margin: 0; line-height: 1.15; }
+.mock.note .cols { columns: 2; column-gap: 6%; font-size: .95em; line-height: 1.45; }
+.mock.note .sealrow { display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid #C3C7CF; padding-top: 3%; font-family: var(--font-data); font-size: .8em; color: #4B5160; }
+.mock.note .sealrow svg { width: clamp(44px, 7vw, 72px); color: #9A7A2F; }
+.sig { font-family: var(--font-display); font-size: 14px; line-height: 1.5; border-left: 2px solid var(--gold); padding-left: 14px; }
+.sig b { font-weight: 600; letter-spacing: .14em; font-stretch: 125%; }
+.gaze { display: grid; place-items: center; padding: 24px; background: var(--surface); border: 1px solid var(--line); }
+.gaze svg { width: 160px; color: var(--gold); }
+pre { background: var(--surface); border: 1px solid var(--line); padding: 16px; overflow-x: auto; font-family: var(--font-data); font-size: 13px; line-height: 1.5; color: var(--fg); }
+.kv { display: grid; grid-template-columns: 180px 1fr; gap: 8px 16px; font-family: var(--font-display); font-size: 15px; }
+.kv dt { color: var(--fg-2); } .kv dd { margin: 0; }
+footer { padding: 40px 0 64px; color: var(--fg-3); font-family: var(--font-display); font-size: 13px; display: flex; flex-wrap: wrap; gap: 16px 32px; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="eye" viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 36 Q50 16 86 36"/><path d="M10 50 Q50 26 90 50 Q50 74 10 50 Z"/><circle cx="50" cy="50" r="12"/><circle cx="50" cy="50" r="4.5" fill="currentColor" stroke="none"/><path d="M60 70 L58 90"/><path d="M12 54 C 4 80, 20 94, 32 88 C 42 83, 40 74, 34 70"/></g></symbol>
+    <symbol id="eye-solid" viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 34 Q50 12 82 34" stroke-width="8"/><path d="M10 50 Q50 20 90 50 Q50 80 10 50 Z" fill="currentColor" stroke="none"/><circle cx="50" cy="50" r="13" fill="var(--seal-bg, #0A0B0D)" stroke="none"/><circle cx="50" cy="50" r="8" fill="currentColor" stroke="none"/><circle cx="50" cy="50" r="3.5" fill="var(--seal-bg, #0A0B0D)" stroke="none"/><path d="M60 70 V 90" stroke-width="7"/><path d="M14 56 C 6 80, 18 92, 30 88 C 40 84, 40 76, 34 72" stroke-width="7"/></g></symbol>
+    <symbol id="eye-small" viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 50 Q50 20 88 50 Q50 80 12 50 Z"/><circle cx="50" cy="50" r="13"/><circle cx="50" cy="50" r="5" fill="var(--pupil, currentColor)" stroke="none"/></g></symbol>
+    <symbol id="seal" viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="47"/><circle cx="50" cy="50" r="39" stroke-width="1"/><g stroke-width="1.5" id="niche-ring"><path d="M50 5 V 10"/><path d="M50 5 V 10" transform="rotate(10 50 50)"/><path d="M50 5 V 10" transform="rotate(20 50 50)"/><path d="M50 5 V 10" transform="rotate(30 50 50)"/><path d="M50 5 V 10" transform="rotate(40 50 50)"/><path d="M50 5 V 10" transform="rotate(50 50 50)"/><path d="M50 5 V 10" transform="rotate(60 50 50)"/><path d="M50 5 V 10" transform="rotate(70 50 50)"/><path d="M50 5 V 10" transform="rotate(80 50 50)"/><path d="M50 5 V 10" transform="rotate(90 50 50)"/><path d="M50 5 V 10" transform="rotate(100 50 50)"/><path d="M50 5 V 10" transform="rotate(110 50 50)"/><path d="M50 5 V 10" transform="rotate(120 50 50)"/><path d="M50 5 V 10" transform="rotate(130 50 50)"/><path d="M50 5 V 10" transform="rotate(140 50 50)"/><path d="M50 5 V 10" transform="rotate(150 50 50)"/><path d="M50 5 V 10" transform="rotate(160 50 50)"/><path d="M50 5 V 10" transform="rotate(170 50 50)"/><path d="M50 5 V 10" transform="rotate(180 50 50)"/><path d="M50 5 V 10" transform="rotate(190 50 50)"/><path d="M50 5 V 10" transform="rotate(200 50 50)"/><path d="M50 5 V 10" transform="rotate(210 50 50)"/><path d="M50 5 V 10" transform="rotate(220 50 50)"/><path d="M50 5 V 10" transform="rotate(230 50 50)"/><path d="M50 5 V 10" transform="rotate(240 50 50)"/><path d="M50 5 V 10" transform="rotate(250 50 50)"/><path d="M50 5 V 10" transform="rotate(260 50 50)"/><path d="M50 5 V 10" transform="rotate(270 50 50)"/><path d="M50 5 V 10" transform="rotate(280 50 50)"/><path d="M50 5 V 10" transform="rotate(290 50 50)"/><path d="M50 5 V 10" transform="rotate(300 50 50)"/><path d="M50 5 V 10" transform="rotate(310 50 50)"/><path d="M50 5 V 10" transform="rotate(320 50 50)"/><path d="M50 5 V 10" transform="rotate(330 50 50)"/><path d="M50 5 V 10" transform="rotate(340 50 50)"/><path d="M50 5 V 10" transform="rotate(350 50 50)"/></g></g><g transform="translate(50 50) scale(0.5) translate(-50 -50)"><use href="#eye-solid"/></g></symbol>
+    <symbol id="serekh" viewBox="0 0 75 100"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="67" height="92" rx="1"/><path d="M4 66 H 71"/><g stroke-width="1.6"><path d="M12 72 V 90"/><path d="M19 72 V 90"/><path d="M26 72 V 90"/><path d="M33 72 V 90"/><path d="M40 72 V 90"/><path d="M47 72 V 90"/><path d="M54 72 V 90"/><path d="M61 72 V 90"/><path d="M8 78 H 67" opacity=".6"/></g></g><g transform="translate(37.5 35) scale(0.5) translate(-50 -50)"><use href="#eye"/></g></symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+
+<header class="cover">
+  <svg class="mark" viewBox="0 0 100 100" role="img" aria-label="The Horus mark"><use href="#eye"/></svg>
+  <div>
+    <h1>Horus</h1>
+    <p class="lead" style="margin-top:16px">Brand manual. How the company looks, speaks and stamps its work.</p>
+  </div>
+  <div class="meta"><span>Edition 1</span><span>October 2026</span><span>Issued by the founder</span><span>For everyone who makes anything in the name of Horus</span></div>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <a href="#s1"><span>01</span>The idea</a>
+  <a href="#s2"><span>02</span>The name and its meaning</a>
+  <a href="#s3"><span>03</span>The mark</a>
+  <a href="#s4"><span>04</span>The seal</a>
+  <a href="#s5"><span>05</span>Wordmark and lockups</a>
+  <a href="#s6"><span>06</span>Colour</a>
+  <a href="#s7"><span>07</span>Typography</a>
+  <a href="#s8"><span>08</span>Graphic system</a>
+  <a href="#s9"><span>09</span>Motion</a>
+  <a href="#s10"><span>10</span>Voice</a>
+  <a href="#s11"><span>11</span>Applications</a>
+  <a href="#s12"><span>12</span>Tokens and files</a>
+</nav>
+
+<section id="s1">
+  <div class="section-head"><span class="n">01</span><h2>The idea</h2></div>
+  <p class="lead">Horus is a technology company. Its product is an AI system that runs policy engagements for governments end to end: it takes a scope of work, plans the engagement, reads the whole record, conducts the stakeholder consultations, appraises the options and delivers the sealed policy document. The brand has one job: make that credible at first sight.</p>
+  <div class="grid g3" style="margin-top:32px">
+    <div class="plate"><h3>Position</h3><p>A technology company replacing parts of consulting for governments, built AI-native. Not a consultancy with AI tools, not a chatbot. A company whose work carries a seal because every claim in it can be checked. The company is called Horus, never Horus Advisory.</p></div>
+    <div class="plate"><h3>Promise</h3><p>Advice that can be checked: every claim traced to its source, every option appraised by one method, every stakeholder heard, delivered in weeks by one system that runs the engagement end to end.</p></div>
+    <div class="plate"><h3>Tension to hold</h3><p>Ultra-modern and ancient at once. The technology is the newest there is; the role, counsel to the state, is the oldest profession in government. The brand keeps both in frame.</p></div>
+  </div>
+  <h3 style="margin-top:40px">Personality</h3>
+  <table style="margin-top:12px">
+    <tr><th style="width:26%">Trait</th><th>What it looks like</th><th>What it never looks like</th></tr>
+    <tr><td>Watchful</td><td>Sees the whole field, notices what others miss, says so plainly</td><td>Surveillance, menace, a staring eye in the dark</td></tr>
+    <tr><td>Exact</td><td>Numbers with units, sources with snapshots, dates in full</td><td>Vague claims, superlatives, decorative statistics</td></tr>
+    <tr><td>Composed</td><td>Few words, generous space, nothing that blinks or shouts</td><td>Hype, urgency, exclamation marks, gradients that glow</td></tr>
+    <tr><td>Accountable</td><td>Shows its reasoning, traces every claim, seals only what has passed every check</td><td>Assertions without sources, unsealed advice, hiding how a conclusion was reached</td></tr>
+    <tr><td>Forward</td><td>Engineered forms, live state, precise motion</td><td>Science-fiction clichés, chrome, circuit boards, glowing orbs</td></tr>
+  </table>
+</section>
+
+<section id="s2">
+  <div class="section-head"><span class="n">02</span><h2>The name and its meaning</h2></div>
+  <div class="two">
+    <div>
+      <p>Horus is the falcon god of the Egyptian sky: the one who sees from above. His name, <em>Ḥr</em>, is usually read as "the distant one", the bird so high it takes in the whole land at once. That is the company's idea of oversight: the full picture, held calmly, from a height that lets you see how the parts fit.</p>
+      <p>The pharaoh ruled as the living Horus. For the first dynasties the king's most important name, the Horus name, was written inside a <strong>serekh</strong>: a rectangular frame drawn as the niched facade of the palace, with the falcon perched on top. It is the oldest royal seal in the world and the direct ancestor of every government stamp since. The Horus seal borrows its niche pattern.</p>
+      <p>The <strong>Eye of Horus</strong>, the wedjat, was the eye torn out in his fight with Set and made whole again by Thoth. Egyptians wore it for protection and wholeness, and used its parts as fractions: one half, one quarter, one eighth, down to one sixty-fourth. The parts add up to sixty-three sixty-fourths. The missing fraction, the story goes, was restored by magic. Horus takes that as a rule about evidence: say what the record shows, and say where the last sixty-fourth is missing.</p>
+    </div>
+    <div class="grid" style="gap:16px">
+      <div class="plate"><h4>Oversight</h4><p>The falcon's view. The company sees across ministries, stakeholders and sources, and reports from above the fray.</p></div>
+      <div class="plate"><h4>Authority</h4><p>The serekh and the royal name. Work that is sealed and stood behind.</p></div>
+      <div class="plate"><h4>Wholeness and honesty</h4><p>The restored eye and its fractions. Complete where it can be, explicit about the gap where it cannot.</p></div>
+      <div class="plate"><h4>What we do not borrow</h4><p>Pyramids, hieroglyph fonts, sand, papyrus textures, pharaoh imagery. The brand is Egyptian in idea, not in costume.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="s3">
+  <div class="section-head"><span class="n">03</span><h2>The mark</h2></div>
+  <p class="lead">The Wedjat Lens. A single-weight drawing of the Eye of Horus whose iris is an instrument: a lens, a ring and a point of focus. It reads as an eye at any size, as a seal when enclosed, and as the company's AI participant when the point of focus goes live.</p>
+  <div class="grid g2" style="margin-top:32px">
+    <div class="plate dark"><svg viewBox="0 0 100 100" style="max-width:360px;margin:0 auto"><use href="#eye"/></svg><div class="cap"><b>Primary mark</b> · gold on obsidian · single stroke weight</div></div>
+    <div class="plate dark">
+      <svg viewBox="0 0 100 100" style="max-width:360px;margin:0 auto" aria-label="Construction of the mark">
+        <g stroke="#2A2E36" stroke-width=".5" fill="none">
+          <rect x="10" y="26" width="80" height="48"/><line x1="50" y1="6" x2="50" y2="96"/><line x1="4" y1="50" x2="96" y2="50"/>
+          <circle cx="50" cy="50" r="12" stroke-dasharray="1.5 1.5"/><circle cx="50" cy="50" r="24" stroke-dasharray="1.5 1.5"/><circle cx="50" cy="50" r="36" stroke-dasharray="1.5 1.5"/>
+          <line x1="10" y1="90" x2="90" y2="90"/><line x1="14" y1="36" x2="86" y2="36" stroke-dasharray="1.5 1.5"/>
+        </g>
+        <g fill="#6B7280" font-family="IBM Plex Mono, monospace" font-size="3.2"><text x="63" y="48">r</text><text x="75" y="48">2r</text><text x="87" y="48">3r</text><text x="12" y="94.5">baseline 90</text><text x="12" y="34">brow 36</text><text x="56" y="24">almond 26–74</text></g>
+        <use href="#eye" style="color:#C9A24A;opacity:.95"/>
+      </svg>
+      <div class="cap"><b>Construction</b> · everything is set from the iris radius r. Almond height 4r, width 6.7r, brow at 1.2r above the lid, teardrop ends at the baseline 3.3r below centre, the spiral returns inside the almond's shadow</div>
+    </div>
+  </div>
+  <h3 style="margin-top:40px">What each stroke means</h3>
+  <div class="grid g4" style="margin-top:12px">
+    <div class="plate"><h4>Brow</h4><p>The falcon's height. Oversight, the view from above.</p></div>
+    <div class="plate"><h4>Almond</h4><p>Attention. The field the company keeps in view.</p></div>
+    <div class="plate"><h4>Lens and focus</h4><p>The instrument. Research, measurement, the AI at work. The focus point is the only element that ever changes colour.</p></div>
+    <div class="plate"><h4>Teardrop and spiral</h4><p>The falcon's cheek markings. The record kept, and the return: evidence that comes back to be checked.</p></div>
+  </div>
+  <h3 style="margin-top:40px">The family</h3>
+  <div class="grid g4" style="margin-top:12px">
+    <div class="plate dark"><svg viewBox="0 0 100 100"><use href="#eye"/></svg><div class="cap"><b>Full mark</b><br>32 px or 9 mm and above</div></div>
+    <div class="plate dark"><svg viewBox="0 0 100 100"><use href="#eye-solid"/></svg><div class="cap"><b>Solid mark</b><br>stamps, embossing, 16 px to 32 px</div></div>
+    <div class="plate dark"><svg viewBox="0 0 100 100"><use href="#eye-small"/></svg><div class="cap"><b>Small mark</b><br>favicons, avatars, 12 px to 24 px</div></div>
+    <div class="plate dark"><svg viewBox="0 0 100 100" style="--pupil:#3A6BFF"><use href="#eye-small"/></svg><div class="cap"><b>Live mark</b><br>only while Horus is active in a meeting or a session</div></div>
+  </div>
+  <h3 style="margin-top:40px">Colour applications</h3>
+  <div class="grid g3" style="margin-top:12px">
+    <div class="plate dark"><svg viewBox="0 0 100 100" style="max-width:200px"><use href="#eye"/></svg><div class="cap"><b>Gold on obsidian</b> · the default</div></div>
+    <div class="plate light"><svg viewBox="0 0 100 100" style="max-width:200px"><use href="#eye"/></svg><div class="cap"><b>Ink on platinum</b> · documents, print, light interfaces</div></div>
+    <div class="plate gold"><svg viewBox="0 0 100 100" style="max-width:200px;--seal-bg:#C9A24A"><use href="#eye-solid"/></svg><div class="cap"><b>Obsidian on gold</b> · foil, badges, the rare gold field</div></div>
+  </div>
+  <div class="two" style="margin-top:40px">
+    <div>
+      <h3>Clear space and minimum size</h3>
+      <p>Keep a clear zone of one lens diameter (2r) around the mark on every side. Nothing enters it: no text, no rule, no edge of a photograph. The full mark is never set below 32 pixels or 9 millimetres; below that, use the solid mark, and below 16 pixels the small mark.</p>
+      <h3 style="margin-top:24px">Placement</h3>
+      <p>The mark sits at a corner, never centred on a page unless it is the only thing on it. On slides it signs the bottom-left, the way a letterhead signs the top-left. On documents the seal, not the mark, closes the page.</p>
+    </div>
+    <div class="plate dark" style="place-items:center">
+      <svg viewBox="0 0 160 160" style="max-width:280px"><rect x="18" y="18" width="124" height="124" fill="none" stroke="#2A2E36" stroke-dasharray="3 3"/><rect x="42" y="42" width="76" height="76" fill="none" stroke="#2A2E36" stroke-width=".5"/><g transform="translate(42 42) scale(.76)"><use href="#eye" style="color:#C9A24A"/></g><g fill="#6B7280" font-family="IBM Plex Mono, monospace" font-size="6"><text x="20" y="14">clear zone = 2r</text></g></svg>
+      <div class="cap">The lens diameter is the unit of clear space</div>
+    </div>
+  </div>
+  <h3 style="margin-top:40px">Misuse</h3>
+  <div class="dont" style="margin-top:12px">
+    <div class="plate dark"><svg viewBox="0 0 100 100" style="transform:rotate(-14deg)"><use href="#eye"/></svg><div class="cap">Do not rotate or tilt</div></div>
+    <div class="plate dark"><svg viewBox="0 0 100 100" style="transform:scaleX(1.5);width:66%;margin:0 auto"><use href="#eye"/></svg><div class="cap">Do not stretch</div></div>
+    <div class="plate dark"><svg viewBox="0 0 100 100" style="color:#9D4EDD"><use href="#eye"/></svg><div class="cap">No other hues</div></div>
+    <div class="plate dark"><svg viewBox="0 0 100 100" style="color:#C9A24A;filter:drop-shadow(0 0 10px #C9A24A)"><use href="#eye"/></svg><div class="cap">No glow, shadow or gradient</div></div>
+    <div class="plate dark"><svg viewBox="0 0 100 100"><g stroke="#C9A24A" stroke-width="1" fill="none"><use href="#eye" style="color:#C9A24A"/><rect x="2" y="2" width="96" height="96"/></g></svg><div class="cap">No boxes or outlines around it</div></div>
+    <div class="plate dark"><svg viewBox="0 0 100 100" style="opacity:.15"><use href="#eye"/><use href="#eye" transform="translate(30 30) scale(.5)"/><use href="#eye" transform="translate(-20 50) scale(.4)"/></svg><div class="cap">Not as a wallpaper pattern</div></div>
+  </div>
+</section>
+
+<section id="s4">
+  <div class="section-head"><span class="n">04</span><h2>The seal</h2></div>
+  <p class="lead">The seal is the mark in office. It goes only on work that has passed every Horus check: a policy document, a decision brief, a final deck, a letter of advice. It is the company's equivalent of the eagle on a government stamp, and it is used with the same restraint.</p>
+  <div class="grid g2" style="margin-top:32px">
+    <div class="plate dark"><svg viewBox="0 0 100 100" style="max-width:320px;margin:0 auto"><use href="#seal"/></svg><div class="cap"><b>The Horus seal</b> · outer ring, the niche ring of the serekh, the solid eye at the centre</div></div>
+    <div class="plate light"><svg viewBox="0 0 100 100" style="max-width:320px;margin:0 auto;--seal-bg:#F2F3F5"><use href="#seal"/></svg><div class="cap"><b>On documents</b> · ink or deep gold on platinum paper</div></div>
+  </div>
+  <div class="two" style="margin-top:40px">
+    <div>
+      <h3>Anatomy</h3>
+      <dl class="kv" style="margin-top:12px">
+        <dt>Outer ring</dt><dd>2.4 units at 100; the boundary of what Horus vouches for</dd>
+        <dt>Niche ring</dt><dd>36 bars, the palace facade of the serekh, the oldest royal seal</dd>
+        <dt>Centre</dt><dd>The solid mark; never the outline mark, which breaks up when stamped</dd>
+        <dt>Text ring</dt><dd>Optional, outside the niche ring: HORUS, and the engagement code at the foot. No descriptor</dd>
+        <dt>Focus point</dt><dd>Always the seal colour. The lapis live state never appears on a seal</dd>
+      </dl>
+    </div>
+    <div>
+      <h3>Rules of use</h3>
+      <p>The seal is applied once per document, at the close of the page or the foot of the cover, never in a header, never repeated. Minimum size is 28 millimetres in print and 96 pixels on screen; the preferred print size is 36 millimetres. In print it may be blind-embossed or foiled in gold; on screen it is flat colour.</p>
+      <p>What carries the seal: final policy documents, decision briefs, final decks, letters of advice, once every check has passed. What does not: drafts, working papers, emails, slides inside a deck, the website, social media. A sealed document carries the attestation line beside the seal, in Plex Mono: the checks passed, the engagement code, the date and the version.</p>
+    </div>
+  </div>
+  <div class="grid g3" style="margin-top:32px">
+    <div class="plate dark"><svg viewBox="0 0 75 100" style="max-width:150px;margin:0 auto"><use href="#serekh"/></svg><div class="cap"><b>Serekh plaque</b> · the secondary device: covers, spines, the meeting avatar frame</div></div>
+    <div class="plate dark"><div style="display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap"><svg viewBox="0 0 100 100" style="width:96px"><use href="#seal"/></svg><svg viewBox="0 0 100 100" style="width:64px"><use href="#seal"/></svg><svg viewBox="0 0 100 100" style="width:40px"><use href="#seal"/></svg></div><div class="cap"><b>Sizes</b> · 96 px minimum on screen; below it, use the solid mark instead</div></div>
+    <div class="plate dark"><div style="font-family:var(--font-data);font-size:13px;color:#9DA3AD;line-height:1.7">SEALED · FIVE CHECKS PASSED<br>DCT-2026-001<br>2026-10-26 · version 2<br>Decision brief</div><div class="cap"><b>Attestation line</b> · set beside the seal in Plex Mono</div></div>
+  </div>
+</section>
+
+<section id="s5">
+  <div class="section-head"><span class="n">05</span><h2>Wordmark and lockups</h2></div>
+  <p class="lead">The wordmark is the name set in Saira at its widest width, capitals, letterspaced. The expanded width gives it the engineered, aerospace feel; the spacing gives it the calm of an inscription.</p>
+  <div class="grid g2" style="margin-top:32px">
+    <div class="plate dark" style="place-items:start"><div style="font-family:var(--font-display);font-weight:600;font-stretch:125%;font-size:clamp(40px,7vw,72px);letter-spacing:.22em;color:#D6D8DD;line-height:1">HORUS</div><div class="cap"><b>Wordmark</b> · Saira 600, width 125, tracking 0.22 em, platinum</div></div>
+    <div class="plate dark" style="place-items:start"><div style="display:flex;align-items:center;gap:24px"><svg viewBox="0 0 100 100" style="width:72px;color:#C9A24A"><use href="#eye"/></svg><div style="font-family:var(--font-display);font-weight:600;font-stretch:125%;font-size:clamp(28px,5vw,44px);letter-spacing:.22em;color:#D6D8DD;line-height:1">HORUS</div></div><div class="cap"><b>Horizontal lockup</b> · mark in gold, name in platinum, gap of one lens diameter</div></div>
+    <div class="plate dark" style="place-items:center"><div style="display:grid;justify-items:center;gap:14px"><svg viewBox="0 0 100 100" style="width:88px;color:#C9A24A"><use href="#eye"/></svg><div style="font-family:var(--font-display);font-weight:600;font-stretch:125%;font-size:30px;letter-spacing:.22em;color:#D6D8DD;line-height:1">HORUS</div></div><div class="cap"><b>Stacked lockup</b> · covers and the website footer. The wordmark stands alone: no descriptor line, and never Horus Advisory or Policy Advisory as a name</div></div>
+    <div class="plate dark" style="place-items:start"><div style="font-family:var(--font-display);font-weight:600;font-stretch:125%;font-size:clamp(28px,5vw,44px);letter-spacing:.22em;color:#C9A24A;line-height:1">HORUS</div><div class="cap"><b>Gold wordmark</b> · only when the mark is absent, and only on obsidian</div></div>
+  </div>
+  <p style="margin-top:24px">The wordmark never appears in lower case, never in a condensed width and never in any other typeface. Minimum size is 14 pixels or 4 millimetres cap height. In running text the company is written Horus, in normal capitalisation, like any name. It is a technology company, and the words around the name say so: never the company, the practice or the consultancy.</p>
+</section>
+
+<section id="s6">
+  <div class="section-head"><span class="n">06</span><h2>Colour</h2></div>
+  <p class="lead">Obsidian ground, platinum text, gold for the few things that matter. The palette is the palette of a seal: dark stone, polished metal, one precious line. A single cold colour, lapis, is kept for one meaning only: Horus is live.</p>
+  <div class="swatches" style="margin-top:32px">
+    <div class="sw"><div class="chip" style="background:#0A0B0D"></div><div class="lbl"><b>Obsidian</b><code>#0A0B0D</code><span>Page, ground</span></div></div>
+    <div class="sw"><div class="chip" style="background:#121418"></div><div class="lbl"><b>Basalt</b><code>#121418</code><span>Raised surface</span></div></div>
+    <div class="sw"><div class="chip" style="background:#1C1F25"></div><div class="lbl"><b>Graphite</b><code>#1C1F25</code><span>Lines, borders</span></div></div>
+    <div class="sw"><div class="chip" style="background:#D6D8DD"></div><div class="lbl"><b>Platinum</b><code>#D6D8DD</code><span>Primary text</span></div></div>
+    <div class="sw"><div class="chip" style="background:#9DA3AD"></div><div class="lbl"><b>Silver</b><code>#9DA3AD</code><span>Secondary text</span></div></div>
+    <div class="sw"><div class="chip" style="background:#6B7280"></div><div class="lbl"><b>Steel</b><code>#6B7280</code><span>Captions, large only</span></div></div>
+    <div class="sw"><div class="chip" style="background:#C9A24A"></div><div class="lbl"><b>Royal gold</b><code>#C9A24A</code><span>Mark, seal, key figure, rule</span></div></div>
+    <div class="sw"><div class="chip" style="background:#9A7A2F"></div><div class="lbl"><b>Deep gold</b><code>#9A7A2F</code><span>Gold on light surfaces</span></div></div>
+    <div class="sw"><div class="chip" style="background:#E8D7A4"></div><div class="lbl"><b>Pale gold</b><code>#E8D7A4</code><span>Highlights on dark</span></div></div>
+    <div class="sw"><div class="chip" style="background:#3A6BFF"></div><div class="lbl"><b>Lapis</b><code>#3A6BFF</code><span>Live state only</span></div></div>
+    <div class="sw"><div class="chip" style="background:#F2F3F5"></div><div class="lbl"><b>Platinum paper</b><code>#F2F3F5</code><span>Light surface, documents</span></div></div>
+    <div class="sw"><div class="chip" style="background:#111318"></div><div class="lbl"><b>Ink</b><code>#111318</code><span>Text on light</span></div></div>
+  </div>
+  <div class="two" style="margin-top:40px">
+    <div>
+      <h3>Proportion</h3>
+      <p>Roughly ninety parts obsidian and basalt, seven parts platinum and silver, three parts gold, and lapis as a point, never an area. Gold is a line, a mark, a single figure, a rule under a title. It is never a background for text and never a paragraph colour. Where an audience expects warmth, the warmth comes from pale gold at small sizes, not from more gold.</p>
+      <h3 style="margin-top:24px">Semantic colour</h3>
+      <p>Good <span class="data" style="color:var(--good)">#3DA66B</span>, warning <span class="data" style="color:var(--warn)">#D08A2A</span> and critical <span class="data" style="color:var(--critical)">#C8453A</span> exist for state in interfaces and charts. They are not accent colours and never decorate.</p>
+    </div>
+    <div>
+      <h3>Contrast</h3>
+      <table style="margin-top:12px">
+        <tr><th>Pair</th><th class="data">Ratio</th><th>Use</th></tr>
+        <tr><td>Platinum on obsidian</td><td class="data num">13.8 : 1</td><td>All text</td></tr>
+        <tr><td>Gold on obsidian</td><td class="data num">8.2 : 1</td><td>Mark, labels, figures</td></tr>
+        <tr><td>Silver on obsidian</td><td class="data num">7.8 : 1</td><td>Secondary text</td></tr>
+        <tr><td>Lapis on obsidian</td><td class="data num">4.4 : 1</td><td>Live indicator, not text</td></tr>
+        <tr><td>Steel on obsidian</td><td class="data num">4.1 : 1</td><td>Captions 18 px and up only</td></tr>
+        <tr><td>Ink on platinum paper</td><td class="data num">16.7 : 1</td><td>All document text</td></tr>
+        <tr><td>Deep gold on paper</td><td class="data num">3.6 : 1</td><td>Seal and rules, large titles only</td></tr>
+        <tr><td>Royal gold on paper</td><td class="data num">2.2 : 1</td><td>Never for text</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="s7">
+  <div class="section-head"><span class="n">07</span><h2>Typography</h2></div>
+  <p class="lead">Three faces, each with one job. Saira, an engineered sans with a width axis, for display and interface. Source Serif 4 for anything read at length: the company's advice is read by ministers, and serious reading deserves a serif. IBM Plex Mono for data, codes, dates and attestation.</p>
+  <div class="grid g3" style="margin-top:32px">
+    <div class="plate"><div style="font-family:var(--font-display);font-weight:600;font-stretch:118%;font-size:40px;line-height:1">Saira</div><p style="margin-top:8px">Display, headings, wordmark, interface controls, table text. Weights 400 to 600; width 100 for text, 112 to 125 for titles and the wordmark, 85 for dense tables. Never below 85.</p><small class="data" style="color:var(--fg-3)">Google Fonts · variable: wdth 50–125, wght 100–900</small></div>
+    <div class="plate"><div style="font-family:var(--font-text);font-weight:500;font-size:40px;line-height:1">Source Serif 4</div><p style="margin-top:8px">Paragraphs, briefs, policy notes, letters, long captions. Weight 400 for text, 600 for emphasis. Optical size follows the point size automatically. Line length 60 to 70 characters.</p><small class="data" style="color:var(--fg-3)">Google Fonts · variable: opsz 8–60, wght 200–900</small></div>
+    <div class="plate"><div style="font-family:var(--font-data);font-weight:500;font-size:36px;line-height:1">Plex Mono</div><p style="margin-top:8px">Engagement codes, record identifiers, dates, figures in tables, attestation lines, source grades. Weight 400 and 500. Always tabular.</p><small class="data" style="color:var(--fg-3)">Google Fonts · 400, 500, 600</small></div>
+  </div>
+  <h3 style="margin-top:40px">Scale</h3>
+  <div style="margin-top:8px">
+    <div class="spec"><div class="d" style="font-size:72px;font-weight:600;font-stretch:125%;letter-spacing:.14em;line-height:1">TIER 0</div><small>Display · Saira 600 · 72 / 1.0 · width 125 · tracking .14em · the wordmark register, used once per page at most</small></div>
+    <div class="spec"><div class="d" style="font-size:40px;font-weight:600;font-stretch:112%;line-height:1.1">A phased mandate reaches 80 percent of firms by year three</div><small>Title · Saira 600 · 40 / 1.1 · width 112 · sentence case, answer-first</small></div>
+    <div class="spec"><div class="d" style="font-size:24px;font-weight:500;line-height:1.25">Stakeholder evidence favours a two-year transition for small merchants</div><small>Heading · Saira 500 · 24 / 1.25</small></div>
+    <div class="spec"><div style="font-size:17px;line-height:1.6;max-width:66ch">The ministry's own data show that firms already filing value-added tax online adopt electronic invoicing within one quarter of a mandate. Firms outside that system take closer to three years, and most of the cost of the transition falls on them.</div><small>Text · Source Serif 4 400 · 17 / 1.6 · 66 characters</small></div>
+    <div class="spec"><div class="d" style="font-size:14px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-2)">Evidence grade · Source · Date</div><small>Label · Saira 500 · 14 · tracking .06em · capitals, used for data keys only, never for section eyebrows</small></div>
+    <div class="spec"><div class="data" style="font-size:13px">EVD-0142 · B · worldbank.org/… · 2026-10-14 · snapshot 7f3a</div><small>Data · Plex Mono 400 · 13 · tabular figures</small></div>
+  </div>
+  <div class="two" style="margin-top:32px">
+    <div><h3>Rules</h3><p>Headings in sentence case, and they state the finding, not the topic. Capitals are reserved for the wordmark, the display register and data keys. Numbers are set tabular wherever they align. Emphasis is weight, never colour and never underlining. No more than two sizes on a slide; no more than four on a page.</p></div>
+    <div><h3>Never</h3><p>Inter, Space Grotesk, Instrument Serif and the other default faces of generated design; condensed capitals for drama; letterspaced lower case; gold text in paragraphs; random bold words in a sentence; small capitals used as decoration.</p></div>
+  </div>
+</section>
+
+<section id="s8">
+  <div class="section-head"><span class="n">08</span><h2>Graphic system</h2></div>
+  <p class="lead">Four devices carry the brand beyond the mark. Each comes from the same sources and each does work; none is decoration.</p>
+  <div class="grid g2" style="margin-top:32px">
+    <div class="plate"><h3>The rule</h3><p>A one-pixel line in graphite, or in gold under a title. It separates, it measures, it signs. Tables are built from rules alone, with no fills and no zebra striping.</p><div style="height:1px;background:var(--line)"></div><div style="height:1px;background:var(--gold);margin-top:14px;width:40%"></div></div>
+    <div class="plate"><h3>The niche</h3><p>The serekh's facade as a pattern: vertical bars at a fixed pitch. Used as a divider, a header band on a cover, or the ring of the seal. Never as a full-page texture.</p><svg viewBox="0 0 300 24" style="color:var(--gold)"><g stroke="currentColor" stroke-width="1.6"><path d="M4 2V22M14 2V22M24 2V22M34 2V22M44 2V22M54 2V22M64 2V22M74 2V22M84 2V22M94 2V22M104 2V22M114 2V22M124 2V22M134 2V22M144 2V22M154 2V22M164 2V22M174 2V22M184 2V22M194 2V22M204 2V22M214 2V22M224 2V22M234 2V22M244 2V22M254 2V22M264 2V22M274 2V22M284 2V22M294 2V22"/></g></svg></div>
+    <div class="plate"><h3>The fractions</h3><p>The parts of the eye as a scale of confidence: 1/2, 1/4, 1/8, 1/16, 1/32, 1/64. Used in charts and evidence displays to show how much of a claim rests on which grade of source, and to make the missing sixty-fourth visible.</p>
+      <svg viewBox="0 0 320 60" style="color:var(--gold)"><g fill="currentColor"><rect x="0" y="10" width="160" height="30"/><rect x="164" y="10" width="80" height="30" opacity=".8"/><rect x="248" y="10" width="40" height="30" opacity=".6"/><rect x="292" y="10" width="20" height="30" opacity=".45"/><rect x="314" y="10" width="4" height="30" opacity=".3"/></g><g fill="#6B7280" font-family="IBM Plex Mono, monospace" font-size="9"><text x="0" y="54">1/2 grade A</text><text x="164" y="54">1/4 B</text><text x="248" y="54">1/8 C</text><text x="292" y="54">…</text></g></svg></div>
+    <div class="plate"><h3>Charts</h3><p>Grey bars on obsidian, one bar in gold where the answer is. Axes are rules, labels are Plex Mono, there is no grid behind the data and no 3D. The same restraint the best roadshow decks use: the number does the work.</p>
+      <svg viewBox="0 0 320 90" style="color:var(--fg-2)"><g fill="#4B5160"><rect x="10" y="50" width="34" height="30"/><rect x="60" y="38" width="34" height="42"/><rect x="110" y="30" width="34" height="50"/><rect x="210" y="56" width="34" height="24"/><rect x="260" y="44" width="34" height="36"/></g><rect x="160" y="12" width="34" height="68" fill="#C9A24A"/><line x1="10" y1="80" x2="310" y2="80" stroke="#2A2E36"/><g fill="#9DA3AD" font-family="IBM Plex Mono, monospace" font-size="9"><text x="10" y="89">Q1</text><text x="60" y="89">Q2</text><text x="110" y="89">Q3</text><text x="160" y="89">Q4</text><text x="210" y="89">Q5</text><text x="260" y="89">Q6</text><text x="160" y="8" fill="#C9A24A">+38%</text></g></svg></div>
+  </div>
+  <h3 style="margin-top:40px">Imagery</h3>
+  <div class="two" style="margin-top:12px">
+    <div><p>Photography, when used at all, is of institutions and territory: ministry architecture, council chambers, ports, grids, satellite and night-light views of the countries the company works in. Monochrome or desaturated, with generous darkness; the mark and type sit in the dark part of the frame.</p></div>
+    <div><p>Never: handshakes, stock boardrooms, robots, glowing brains, circuit boards, pyramids. Illustration is line drawing in a single weight, gold on obsidian, drawn the way the mark is drawn.</p></div>
+  </div>
+</section>
+
+<section id="s9">
+  <div class="section-head"><span class="n">09</span><h2>Motion</h2></div>
+  <p class="lead">Motion is rare, slow and literal. It shows a state or reveals a structure; it never performs. Ninety percent of Horus surfaces do not move at all.</p>
+  <div class="two" style="margin-top:32px">
+    <div>
+      <dl class="kv">
+        <dt>Easing</dt><dd>cubic-bezier(.2,.7,.2,1), the same curve everywhere</dd>
+        <dt>Durations</dt><dd>180 ms for state, 320 ms for reveals, 720 ms for the gaze</dd>
+        <dt>The gaze</dt><dd>On the website, the focus point of the mark follows the pointer within a small radius. It is the one signature motion, and it means oversight</dd>
+        <dt>Live state</dt><dd>While Horus is in a meeting the focus point turns lapis and breathes once every four seconds. Nothing else blinks, ever</dd>
+        <dt>Reveals</dt><dd>Content fades up 8 pixels as it enters; everything is visible without scrolling first</dd>
+        <dt>Never</dt><dd>Scroll-jacking, parallax, auto-advancing tabs, typing effects on headlines, glowing buttons, looping particle fields, anything that moves while a person is reading</dd>
+        <dt>Reduced motion</dt><dd>Every animation is removed when the system asks for it; the page is complete without it</dd>
+      </dl>
+    </div>
+    <div class="gaze" id="gaze-demo" aria-label="Gaze demonstration: the focus point follows the pointer">
+      <svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 36 Q50 16 86 36"/><path d="M10 50 Q50 26 90 50 Q50 74 10 50 Z"/><circle cx="50" cy="50" r="12"/><circle id="gaze-pupil" cx="50" cy="50" r="4.5" fill="currentColor" stroke="none"/><path d="M60 70 L58 90"/><path d="M12 54 C 4 80, 20 94, 32 88 C 42 83, 40 74, 34 70"/></g></svg>
+      <div class="cap" style="font-family:var(--font-display);font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--fg-2);margin-top:12px">Move the pointer: the gaze</div>
+    </div>
+  </div>
+</section>
+
+<section id="s10">
+  <div class="section-head"><span class="n">10</span><h2>Voice</h2></div>
+  <p class="lead">Horus writes the way a trusted adviser speaks to a minister: the answer first, the reasoning second, the evidence always within reach. Plain words, full sentences, numbers with units, and no attempt to impress.</p>
+  <div class="two" style="margin-top:32px">
+    <div>
+      <h3>Principles</h3>
+      <p><strong>Answer first.</strong> The first sentence of anything is the conclusion. The structure beneath it is the pyramid every good consultant learns.</p>
+      <p><strong>Specific.</strong> "Firms already filing VAT online adopt within a quarter" beats "adoption is faster for digitised firms".</p>
+      <p><strong>Sourced.</strong> A claim without a source is an opinion, and Horus labels it as one.</p>
+      <p><strong>Argued.</strong> A recommendation comes with the reasoning that produced it and the evidence it rests on, so that any reader can follow the steps and check the numbers.</p>
+      <p><strong>Calm.</strong> No exclamation marks, no urgency, no superlatives, no hedging into mush. Where the evidence is thin, it says so in one sentence.</p>
+    </div>
+    <div>
+      <h3>Words</h3>
+      <table style="margin-top:12px">
+        <tr><th>We say</th><th>We do not say</th></tr>
+        <tr><td>Horus, the company, the system</td><td>Horus Advisory, the firm, the consultancy, the bot, the platform</td></tr>
+        <tr><td>a technology company, AI-native, runs the engagement end to end</td><td>consulting with AI, AI-assisted, augmented, supervised</td></tr>
+        <tr><td>engagement, brief, decision brief, policy note</td><td>project, deliverable deck, output</td></tr>
+        <tr><td>evidence, source, snapshot, the gap</td><td>insights, data points, learnings</td></tr>
+        <tr><td>sealed, checked, traced, stood behind</td><td>validated, approved by, powered by, leveraged</td></tr>
+        <tr><td>in weeks, by the twelfth, within the quarter</td><td>fast, lightning-fast, instantly, at scale</td></tr>
+        <tr><td>we recommend, the evidence favours</td><td>we believe, we are excited, game-changing</td></tr>
+      </table>
+    </div>
+  </div>
+  <h3 style="margin-top:40px">Standard lines</h3>
+  <div class="grid g2" style="margin-top:12px">
+    <div class="plate"><h4>Opening a consultation</h4><p>"Good morning, and thank you for the time. I am Horus. The Ministry has asked me to design the electronic invoicing mandate for small merchants, and your members will carry most of its compliance cost, so I want to understand adoption from their side. What is the single biggest obstacle today?"</p></div>
+    <div class="plate"><h4>Opening a brief</h4><p>"Recommendation: phase the e-invoicing mandate over three years, starting with firms already filing VAT online. This brief sets out the evidence, the options considered and the risks of each."</p></div>
+    <div class="plate"><h4>When evidence is thin</h4><p>"No primary source holds the compliance cost for micro-enterprises. The estimate below is bounded between the two nearest comparators, flagged in the assumptions register, and should be read as indicative."</p></div>
+    <div class="plate"><h4>Email signature</h4><div class="sig"><b>HORUS</b><br>Engagement DCT-2026-001<br><span class="data" style="color:var(--fg-2)">Horus is a technology company. This message was written and sent by Horus, which runs the engagement end to end. Every claim in its documents traces to a source.</span></div></div>
+  </div>
+</section>
+
+<section id="s11">
+  <div class="section-head"><span class="n">11</span><h2>Applications</h2></div>
+  <p class="lead">How the system comes together on the things the company actually produces.</p>
+  <div class="two" style="margin-top:32px">
+    <div class="mock slide" role="img" aria-label="Slide anatomy">
+      <div class="title">Firms already filing VAT online adopt e-invoicing within one quarter of a mandate</div>
+      <div class="body"><div>Adoption within a year of mandate, by firm type, share of firms. Grade A sources: ministry filings 2024 to 2026.<br><br>Firms outside the VAT system need the full three-year transition, and bear most of the cost.</div><div class="bars"><i style="height:30%"></i><i style="height:42%"></i><i style="height:55%"></i><i class="k" style="height:92%"></i><i style="height:38%"></i><i style="height:26%"></i></div></div>
+      <div class="foot"><svg viewBox="0 0 100 100"><use href="#eye"/></svg><span>Source: Ministry of Finance filings · EVD-0142, 0147 · DCT-2026-001 · 14</span></div>
+    </div>
+    <div>
+      <h3>Slides</h3>
+      <p>Obsidian ground. The title is the finding, in Saira 500 at width 106, top-left, two lines at most. One chart or one exhibit per slide, grey with a single gold answer. The source line and the page number sit on the bottom rule in Plex Mono. The mark signs the bottom-left of every slide; the seal appears only on the cover of a sealed deck, once every check has passed.</p>
+      <p>Tier 0 decks for a head of government carry no more than twelve slides and no slide carries more than forty words.</p>
+    </div>
+  </div>
+  <div class="two" style="margin-top:40px">
+    <div>
+      <h3>Policy notes and briefs</h3>
+      <p>Platinum paper, ink text in Source Serif 4, a Saira title that states the recommendation. Two columns above A4 width, one column below. Data keys in Plex Mono. The seal closes the first page of a final note with the attestation line beside it; drafts carry the word DRAFT in the header and no seal.</p>
+      <h3 style="margin-top:24px">The meeting participant</h3>
+      <p>In Google Meet and Zoom the company appears as <strong>Horus</strong>, with the serekh plaque as its avatar on obsidian. The name is never decorated with a descriptor or a role.</p>
+    </div>
+    <div class="mock note" role="img" aria-label="Policy note first page">
+      <div class="k"><span>Policy note · DCT-2026-001</span><span>Sealed · version 2</span></div>
+      <h5>Phase the mandate over three years, starting with firms already filing online</h5>
+      <div class="cols">Electronic invoicing reaches most of its benefit when adoption passes eighty percent of invoiced value. The evidence favours a phased mandate: firms already filing value-added tax online in year one, medium firms in year two, and the remaining small merchants in year three with a simplified free tool. A single-date mandate would reach the same coverage a year sooner at twice the compliance cost, borne mostly by the smallest firms. The options, their appraisal and the risks of each are set out in the sections that follow.</div>
+      <div class="sealrow"><span>Sealed by Horus · 2026-10-26<br>Five checks passed · version 2</span><svg viewBox="0 0 100 100" style="--seal-bg:#F7F7F5"><use href="#seal"/></svg></div>
+    </div>
+  </div>
+  <div class="grid g3" style="margin-top:40px">
+    <div class="plate dark" style="place-items:center"><svg viewBox="0 0 100 100" style="width:64px;color:#C9A24A;--pupil:#C9A24A"><use href="#eye-small"/></svg><div class="cap"><b>Favicon and app icon</b> · small mark on obsidian</div></div>
+    <div class="plate dark" style="place-items:center"><div style="width:96px;height:96px;background:#0A0B0D;border:1px solid #2A2E36;display:grid;place-items:center"><svg viewBox="0 0 75 100" style="width:52px;color:#C9A24A"><use href="#serekh"/></svg></div><div class="cap"><b>Meeting avatar</b> · the serekh plaque</div></div>
+    <div class="plate dark" style="place-items:center"><div style="display:grid;justify-items:center;gap:10px"><svg viewBox="0 0 100 100" style="width:56px;color:#C9A24A"><use href="#eye"/></svg><div style="font-family:var(--font-display);font-weight:600;font-stretch:125%;font-size:22px;letter-spacing:.22em;color:#D6D8DD">HORUS</div></div><div class="cap"><b>Social and profile</b> · stacked lockup, no descriptor</div></div>
+  </div>
+</section>
+
+<section id="s12">
+  <div class="section-head"><span class="n">12</span><h2>Tokens and files</h2></div>
+  <p class="lead">The system as code, so that the website, the deck templates and the document templates draw from one source.</p>
+<pre>:root {
+  --obsidian: #0A0B0D;  --basalt: #121418;  --graphite: #1C1F25;  --slate: #2A2E36;
+  --platinum: #D6D8DD;  --silver: #9DA3AD;  --steel: #6B7280;
+  --gold: #C9A24A;  --gold-deep: #9A7A2F;  --gold-pale: #E8D7A4;  --lapis: #3A6BFF;
+  --good: #3DA66B;  --warn: #D08A2A;  --critical: #C8453A;
+  --font-display: "Saira", "Archivo", Helvetica, Arial, sans-serif;
+  --font-text: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-data: "IBM Plex Mono", "SF Mono", Menlo, Consolas, monospace;
+  --ease: cubic-bezier(.2,.7,.2,1);  --t-fast: 180ms;  --t-base: 320ms;  --t-slow: 720ms;
+  --radius: 2px;
+}</pre>
+  <table style="margin-top:24px">
+    <tr><th>File</th><th>Contents</th></tr>
+    <tr><td class="data">brand/assets/horus-mark-gold.svg</td><td>Full mark, gold, transparent ground. Also ink and white versions</td></tr>
+    <tr><td class="data">brand/assets/horus-mark-solid-gold.svg</td><td>Solid mark for stamps and small sizes. Also ink</td></tr>
+    <tr><td class="data">brand/assets/horus-mark-small-gold.svg</td><td>Small mark; the live version carries the lapis focus point</td></tr>
+    <tr><td class="data">brand/assets/horus-seal-gold.svg</td><td>The seal. Also ink for documents</td></tr>
+    <tr><td class="data">brand/assets/horus-serekh-gold.svg</td><td>The serekh plaque</td></tr>
+    <tr><td class="data">brand/assets/horus-lockup-gold.svg</td><td>Horizontal lockup with the wordmark in Saira. Also ink</td></tr>
+    <tr><td class="data">brand/assets/tokens.css</td><td>The design tokens above, with the light variant</td></tr>
+    <tr><td class="data">brand/horus-brand-manual.html</td><td>This manual</td></tr>
+  </table>
+  <h3 style="margin-top:40px">The short version</h3>
+  <div class="grid g2" style="margin-top:12px">
+    <div class="plate"><h4>Always</h4><p>Gold mark on obsidian, or ink on platinum paper. Saira for titles, Source Serif for reading, Plex Mono for data. Findings as headings. Every claim traced. The seal only on work that has passed every check. The company called Horus, a technology company.</p></div>
+    <div class="plate"><h4>Never</h4><p>Other hues, glows, gradients, rotated or boxed marks. Pyramids and costume Egyptiana. Default fonts of generated design. Blinking, scroll-jacking, auto-advancing anything. Gold paragraphs. Unsourced advice. Horus Advisory, the firm, the consultancy.</p></div>
+  </div>
+</section>
+
+<footer>
+  <span>Horus brand manual · Edition 1 · October 2026</span>
+  <span>Questions go to the founder. Changes are made here, then everywhere.</span>
+</footer>
+</div>
+
+<script>
+(function () {
+  var box = document.getElementById('gaze-demo'); var pupil = document.getElementById('gaze-pupil');
+  if (!box || !pupil || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var svg = pupil.ownerSVGElement; var cx = 50, cy = 50, tx = 50, ty = 50, raf = null;
+  function step () { cx += (tx - cx) * 0.12; cy += (ty - cy) * 0.12; pupil.setAttribute('cx', cx.toFixed(2)); pupil.setAttribute('cy', cy.toFixed(2));
+    if (Math.abs(tx - cx) > 0.05 || Math.abs(ty - cy) > 0.05) raf = requestAnimationFrame(step); else raf = null; }
+  function aim (e) { var r = svg.getBoundingClientRect(); var dx = (e.clientX - (r.left + r.width / 2)) / r.width; var dy = (e.clientY - (r.top + r.height / 2)) / r.height;
+    var len = Math.hypot(dx, dy) || 1; var k = Math.min(len, 0.5) / len; tx = 50 + dx * k * 10; ty = 50 + dy * k * 8; if (!raf) raf = requestAnimationFrame(step); }
+  box.addEventListener('pointermove', aim); box.addEventListener('pointerleave', function () { tx = 50; ty = 50; if (!raf) raf = requestAnimationFrame(step); });
+})();
+</script>

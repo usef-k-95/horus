@@ -1,0 +1,33 @@
+/* Horus design tokens — Edition 1, October 2026 */
+:root {
+  /* surfaces (dark-first: Obsidian) */
+  --obsidian: #0A0B0D;   /* page */
+  --basalt:   #121418;   /* raised surface */
+  --graphite: #1C1F25;   /* lines, borders */
+  --slate:    #2A2E36;   /* hover lines */
+  /* text */
+  --platinum: #D6D8DD;   /* primary text on dark */
+  --silver:   #9DA3AD;   /* secondary text */
+  --steel:    #6B7280;   /* muted, captions */
+  /* accent */
+  --gold:      #C9A24A;  /* royal gold: seal, key figure, rules */
+  --gold-deep: #9A7A2F;  /* pressed, small text on light */
+  --gold-pale: #E8D7A4;  /* highlights on dark */
+  --lapis:     #3A6BFF;  /* live state only: Horus is active */
+  /* semantic, never used as accent */
+  --good: #3DA66B; --warn: #D08A2A; --critical: #C8453A;
+  /* type */
+  --font-display: "Saira", "Archivo", Helvetica, Arial, sans-serif;
+  --font-text: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-data: "IBM Plex Mono", "SF Mono", Menlo, Consolas, monospace;
+  /* motion */
+  --ease: cubic-bezier(.2,.7,.2,1); --t-fast: 180ms; --t-base: 320ms; --t-slow: 720ms;
+  /* radius: none by default; 2px on controls */
+  --radius: 2px;
+}
+/* light surface: Platinum (documents, print) */
+.theme-light, [data-theme="light"] {
+  --obsidian: #F2F3F5; --basalt: #FFFFFF; --graphite: #D9DCE2; --slate: #C3C7CF;
+  --platinum: #111318; --silver: #4B5160; --steel: #6B7280;
+  --gold: #9A7A2F; --gold-deep: #7A5F22; --gold-pale: #C9A24A;
+}
