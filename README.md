@@ -1,10 +1,10 @@
-# Horus — AI-native policy advisory (MVP)
+# Horus — AI-native policy advisory for governments
 
-Horus is an AI-native policy advisory firm. It executes end-to-end advisory engagements (RFP → classification into an advisory pathway → research → live stakeholder interviews → options → appraisal → recommendation, implementation and communication plans) as a **Claude Code plugin** backed by a **lightweight backend** (engagement state and a live-meeting runtime), under a human Supervisor who approves sensitive actions and can intervene.
+Horus is a technology company whose AI runs policy engagements for governments end to end. It executes advisory engagements (scope of work → classification into an advisory pathway → research → live stakeholder interviews → options → appraisal → recommendation, implementation and communication plans) as a **Claude Code plugin** backed by a **lightweight backend** (engagement state, a live-meeting runtime, mail and website intake), under a human Supervisor who approves sensitive actions and can intervene. The public site is [horushq.ai](https://horushq.ai).
 
 ## Status
 
-Build in progress (26 October 2026). The backend (`backend/`: engagement state, MeetStream live-meeting runtime, mail, appraisal toolkit) and the plugin (`plugin/`: skills, agents, hooks, MCP launchers) exist and pass their tests; real meetings and mail need the Supervisor's accounts (see `docs/SPIKE-0-live-meetings.md`).
+MVP in live testing (28 October 2026). The website at horushq.ai takes scopes of work and demo requests and turns them into engagements automatically (`web/`, `backend/src/horus_intake`). The backend (`backend/`: engagement state, MeetStream live-meeting runtime, mail, appraisal toolkit, intake) and the plugin (`plugin/`: skills, agents, hooks, MCP launchers) pass their tests. Running it needs the Supervisor's accounts and keys, which never live in this repository; the operating guide is `docs/GETTING-STARTED.md`.
 
 | Document | Contents |
 |---|---|
@@ -12,6 +12,8 @@ Build in progress (26 October 2026). The backend (`backend/`: engagement state, 
 | [docs/STATE_SCHEMA.md](docs/STATE_SCHEMA.md) | Project-state schema v0.2: storage model, conventions, 4 singletons, 19 collections (including approvals and appraisals) and an event log with full field definitions, enumerations (pathways, autonomy levels, action classes), relationship map, integrity rules, gate checklists, backend API for both servers, views, concurrency and migration |
 | [docs/SPIKE-0-live-meetings.md](docs/SPIKE-0-live-meetings.md) | Live-meeting runbook on MeetStream: what is built, commands, what the Supervisor must set up, verified provider facts |
 | [docs/DECISIONS.md](docs/DECISIONS.md) | Decision log and build log |
+| [docs/GETTING-STARTED.md](docs/GETTING-STARTED.md) | The Supervisor's operating guide: one-time setup, the live-meeting test, running an engagement, the website and automatic intake |
+| [web/README.md](web/README.md) | The website and its intake API: the Cloudflare Worker, the request path from form to engagement, deployment |
 | [docs/BENCHMARKS.md](docs/BENCHMARKS.md) | Sourced catalogue of the public documents the deliverable standard is benchmarked against: MBB public-sector reports and released decks, OECD, EU, UK and US impact-assessment standards, World Bank, IMF, WEF, HKS and Blavatnik formats, and head-of-government decision-memo conventions |
 
 ## Quick start
