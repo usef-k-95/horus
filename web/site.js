@@ -127,8 +127,8 @@
   })();
 
   /* ---------- requests: stored in the page's database when it is available, otherwise posted to the configured endpoint, otherwise shown to copy ---------- */
-  var FORM_ENDPOINT = ''; // set to your form service URL (one that accepts multipart form posts with a file) when the site is hosted on its own domain
-  var CONTACT = ''; // set to the company's address once it exists; shown as text, never as a mailto link
+  var FORM_ENDPOINT = '/api/requests'; // the site's own worker (web/worker); it stores the request, emails the Supervisor and hands it to the intake watcher
+  var CONTACT = 'hello@horushq.ai'; // shown as text in the fallback, never as a mailto link
   var MAX_STORED_FILE = 160 * 1024; // the page database holds a document of up to 256 KiB; larger files travel through the endpoint instead
   function human(n) { return n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(0) + ' KB' : (n / 1048576).toFixed(1) + ' MB'; }
   function asBase64(file) { return new Promise(function (res, rej) { var r = new FileReader(); r.onload = function () { res(String(r.result).split(',')[1] || ''); }; r.onerror = function () { rej(r.error); }; r.readAsDataURL(file); }); }
@@ -175,7 +175,7 @@
         try {
           var fd = new FormData(form); fd.append('kind', kind); fd.append('submitted_at', data.submitted_at); fd.append('page', data.page);
           var r = await fetch(FORM_ENDPOINT, { method: 'POST', headers: { 'Accept': 'application/json' }, body: fd });
-          if (!r.ok) throw new Error('endpoint ' + r.status); sent = true;
+          if (r.ok) { sent = true; } else { var j = null; try { j = await r.json(); } catch (x) { j = null; } if (j && j.error && r.status < 500) { status.className = 'status err'; status.textContent = j.error; btn.disabled = false; return; } throw new Error('endpoint ' + r.status); }
         } catch (err) { sent = false; }
       }
       if (sent) {

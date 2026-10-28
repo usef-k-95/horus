@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key><string>en</string>
+  <key>CFBundleExecutable</key><string>horus-intake</string>
+  <key>CFBundleIdentifier</key><string>ai.horus.intake</string>
+  <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
+  <key>CFBundleName</key><string>Horus Intake</string>
+  <key>CFBundleDisplayName</key><string>Horus Intake</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleShortVersionString</key><string>1.0</string>
+  <key>CFBundleVersion</key><string>1</string>
+  <key>LSMinimumSystemVersion</key><string>12.0</string>
+  <key>LSUIElement</key><true/>
+  <key>LSBackgroundOnly</key><true/>
+  <key>NSDesktopFolderUsageDescription</key><string>Horus Intake runs the Horus tools, which live in the Project Horus folder on your Desktop, so that requests from the website become engagements while you are away.</string>
+  <key>NSDocumentsFolderUsageDescription</key><string>Horus Intake reads the Horus tools and engagement files.</string>
+  <key>NSDownloadsFolderUsageDescription</key><string>Horus Intake reads the Horus tools and engagement files.</string>
+</dict>
+</plist>

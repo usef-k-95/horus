@@ -22,5 +22,5 @@ for t in "$REPO"/tools/*.sh; do
   case "$n" in _common|setup) continue;; esac
   printf '#!/bin/sh\nexec sh "%s" "$@"\n' "$t" > "$HORUS_HOME/$n" && chmod +x "$HORUS_HOME/$n"
 done
-ok "commands ready in ~/Horus: configure, check, install-ngrok, tunnel, install-plugin, new-engagement, test-meeting, horus"
+ok "commands ready in ~/Horus: configure, check, install-ngrok, tunnel, install-plugin, new-engagement, test-meeting, horus, configure-site, deploy-site, intake"
 say "Done. Next: ~/Horus/configure to enter your keys, then ~/Horus/check."

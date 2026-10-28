@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date as date_type, datetime
 from typing import Any, Literal, Optional
 
 from pydantic import Field, field_validator, model_validator
@@ -73,7 +73,7 @@ class Client(StrictModel):
 
 
 class PathwayRevision(StrictModel):
-    date: date
+    date: date_type
     previous: Pathway
     new: Pathway
     decision: Optional[Ref] = None
@@ -95,10 +95,10 @@ class GateState(StrictModel):
 
 
 class Dates(StrictModel):
-    received: Optional[date] = None
-    started: Optional[date] = None
-    target_end: Optional[date] = None
-    closed: Optional[date] = None
+    received: Optional[date_type] = None
+    started: Optional[date_type] = None
+    target_end: Optional[date_type] = None
+    closed: Optional[date_type] = None
 
 
 class WorkerModels(StrictModel):
@@ -225,22 +225,22 @@ class RequiredDeliverable(StrictModel):
     id: str
     description: str
     format: Optional[str] = None
-    due: Optional[date] = None
+    due: Optional[date_type] = None
     maps_to: Optional[Ref] = None
 
 
 class Milestone(StrictModel):
     id: Optional[str] = None
     name: str
-    date: Optional[date] = None
+    date: Optional[date_type] = None
     kind: Optional[Literal["gate", "deliverable", "meeting", "client_input"]] = None
     status: Optional[str] = None
     linked: Optional[Ref] = None
 
 
 class Timeline(StrictModel):
-    start: Optional[date] = None
-    end: Optional[date] = None
+    start: Optional[date_type] = None
+    end: Optional[date_type] = None
     milestones: list[Milestone] = Field(default_factory=list)
 
 
@@ -274,7 +274,7 @@ class Brief(Envelope):
     status: Literal["draft", "clarifying", "confirmed", "amended"] = "draft"
     rfp_documents: list[Ref] = Field(default_factory=list)
     issued_by: Optional[Ref] = None
-    received_on: Optional[date] = None
+    received_on: Optional[date_type] = None
     title: str
     context_summary: str = ""
     problem_statement: ProblemStatement
@@ -361,8 +361,8 @@ class Approach(Envelope):
 class PhasePlan(StrictModel):
     id: Phase
     name: str
-    start: Optional[date] = None
-    end: Optional[date] = None
+    start: Optional[date_type] = None
+    end: Optional[date_type] = None
     gate: Optional[Gate] = None
     status: Literal["planned", "active", "done"] = "planned"
 
@@ -373,8 +373,8 @@ class Activity(StrictModel):
     workstream: Optional[str] = None
     name: str
     owner: Literal["principal", "supervisor", "client"] = "principal"
-    start: Optional[date] = None
-    end: Optional[date] = None
+    start: Optional[date_type] = None
+    end: Optional[date_type] = None
     depends_on: list[str] = Field(default_factory=list)
     status: Literal["planned", "in_progress", "done", "blocked", "dropped"] = "planned"
     outputs: list[Ref] = Field(default_factory=list)
@@ -404,7 +404,7 @@ class Cadence(StrictModel):
 
 
 class ChangeLogEntry(StrictModel):
-    date: date
+    date: date_type
     change: str
     reason: Optional[str] = None
     approved_in: Optional[Ref] = None
@@ -486,7 +486,7 @@ class Stakeholder(Envelope):
     contact: Contact = Field(default_factory=Contact)
     profile: Optional[Ref] = None
     sources: list[Ref] = Field(default_factory=list)
-    last_reviewed: Optional[date] = None
+    last_reviewed: Optional[date_type] = None
     status: Literal["active", "inactive"] = "active"
 
 
@@ -507,12 +507,12 @@ class CareerEntry(StrictModel):
 class StatedPriority(StrictModel):
     theme: str
     statement: Optional[Ref] = None
-    date: Optional[date] = None
+    date: Optional[date_type] = None
 
 
 class TrackRecordEntry(StrictModel):
     decision: str
-    date: Optional[date] = None
+    date: Optional[date_type] = None
     outcome: Optional[str] = None
     source: Optional[Ref] = None
 
@@ -520,13 +520,13 @@ class TrackRecordEntry(StrictModel):
 class TopicPosition(StrictModel):
     topic: str
     position: str
-    date: Optional[date] = None
+    date: Optional[date_type] = None
     evidence: Optional[Ref] = None
 
 
 class CalendarEvent(StrictModel):
     event: str
-    date: Optional[date] = None
+    date: Optional[date_type] = None
     relevance: Optional[str] = None
 
 
@@ -572,7 +572,7 @@ class ProfileReview(StrictModel):
     personal_data_minimised: bool = False
     defamation_check: bool = False
     reviewed_by: Optional[str] = None
-    date: Optional[date] = None
+    date: Optional[date_type] = None
 
 
 class Profile(Envelope):
@@ -629,7 +629,7 @@ class Source(Envelope):
     type: SourceType
     publisher: Optional[str] = None
     authors: list[str] = Field(default_factory=list)
-    publication_date: Optional[date] = None
+    publication_date: Optional[date_type] = None
     url: Optional[str] = None
     doi: Optional[str] = None
     isbn: Optional[str] = None
@@ -649,7 +649,7 @@ class Value(StrictModel):
     unit: Optional[str] = None
     period: Optional[str] = None
     geography: Optional[str] = None
-    as_of: Optional[date] = None
+    as_of: Optional[date_type] = None
     currency: Optional[str] = None
     price_base_year: Optional[int] = None
 
@@ -693,8 +693,8 @@ class Document(Envelope):
     ] = "other"
     origin: Literal["client", "public", "stakeholder", "horus"] = "client"
     received_via: Optional[Ref] = None
-    received_on: Optional[date] = None
-    document_date: Optional[date] = None
+    received_on: Optional[date_type] = None
+    document_date: Optional[date_type] = None
     issuer: Optional[str] = None
     path: str
     hash: str
@@ -709,7 +709,7 @@ class Document(Envelope):
 
 
 class Revision(StrictModel):
-    date: date
+    date: date_type
     previous: str
     new: str
     reason: Optional[str] = None
@@ -1159,13 +1159,13 @@ class TranscriptInfo(StrictModel):
     turns: Optional[int] = None
     verified_by: Optional[str] = None
     verified_at: Optional[datetime] = None
-    retention_until: Optional[date] = None
+    retention_until: Optional[date_type] = None
     off_record_removed: bool = False
 
 
 class RecordingInfo(StrictModel):
     path: Optional[str] = None
-    retention_until: Optional[date] = None
+    retention_until: Optional[date_type] = None
     deleted_at: Optional[datetime] = None
 
 
@@ -1296,7 +1296,7 @@ class ClientInput(Envelope):
     kind: ClientInputKind
     from_stakeholder: Ref = Field(alias="from")
     via: Ref
-    date: date
+    date: date_type
     content_verbatim: Optional[str] = None
     paraphrase: str
     about: list[AboutTarget] = Field(default_factory=list)
@@ -1330,7 +1330,7 @@ class Decision(Envelope):
     made_by: list[str] = Field(default_factory=list)
     forum: Optional[Ref] = None
     channel: Optional[Ref] = None
-    date: date
+    date: date_type
     rationale: str
     alternatives_considered: list[str] = Field(default_factory=list)
     implications: list[Implication] = Field(default_factory=list)
@@ -1338,7 +1338,7 @@ class Decision(Envelope):
     gate: Optional[Gate] = None
     status: DecisionStatus = DecisionStatus.proposed
     supersedes: Optional[Ref] = None
-    review_date: Optional[date] = None
+    review_date: Optional[date_type] = None
 
     @model_validator(mode="after")
     def _confirmed_needs_forum(self):
@@ -1357,19 +1357,19 @@ class OpenQuestion(Envelope):
     kind: Literal["clarification", "data", "analytical", "political", "process"] = "clarification"
     raised_by: str
     raised_in: Optional[str] = None
-    date: date
+    date: date_type
     owner: str
     priority: Priority = Priority.P2
     blocking: list[str] = Field(default_factory=list)
-    due: Optional[date] = None
+    due: Optional[date_type] = None
     status: OpenQuestionStatus = OpenQuestionStatus.open
     answer: Optional[str] = None
     answered_by: Optional[Ref] = None
-    answered_at: Optional[date] = None
+    answered_at: Optional[date_type] = None
 
 
 class Reminder(StrictModel):
-    date: date
+    date: date_type
     sent_in: Optional[Ref] = None
 
 
@@ -1380,7 +1380,7 @@ class Action(Envelope):
     detail: Optional[str] = None
     owner: str
     requested_via: Optional[Ref] = None
-    due: Optional[date] = None
+    due: Optional[date_type] = None
     priority: Priority = Priority.P2
     status: ActionStatus = ActionStatus.todo
     fulfilled_by: Optional[Ref] = None

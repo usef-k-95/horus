@@ -14,4 +14,5 @@ else warn "ElevenLabs key not entered yet"; fi
 say "ngrok:"; NG="$(command -v ngrok || echo "$HOME/.local/bin/ngrok")"
 if [ -x "$NG" ]; then ok "installed"; ngrok_has_token && ok "authtoken saved" || warn "authtoken missing: run ~/Horus/install-ngrok and paste it"; d="$(getv NGROK_DOMAIN)"; [ -n "$d" ] && ok "static domain: $d" || warn "no static domain (optional; the address will change each time)"; else warn "ngrok not installed: run ~/Horus/install-ngrok"; fi
 say "Tunnel:"; sh "$(dirname "$0")/tunnel.sh" status | sed 's/^/  /'
+say "Website and intake:"; ( cd "$BACKEND" && ./uvw run --no-sync horus-intake check 2>&1 | sed 's/^/  /' )
 say "Plugin:"; CL="$(find_claude)" && "$CL" plugin list 2>/dev/null | grep -A3 "horus@" | sed 's/^/  /' || warn "Horus plugin not installed yet (run tools/install-plugin.sh)"

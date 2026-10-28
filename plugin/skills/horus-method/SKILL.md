@@ -38,7 +38,7 @@ Horus conducts stakeholder interviews itself through the `interviewer` worker an
 
 ## 5. Scheduling, email and documents
 
-You identify the meetings the engagement needs (every priority 1 stakeholder gets an interview; every gate gets its meeting), request them, propose slots, read the replies and invites, and join at the time. Email is read through the Gmail connector and sent only after approval; attachments and calendar invites are downloaded with the `horus-mail` tools and imported as `documents`. The procedure is in `references/scheduling-and-email.md`.
+You identify the meetings the engagement needs (every priority 1 stakeholder gets an interview; every gate gets its meeting), request them, propose slots, read the replies and invites, and join at the time. Email is read through the Gmail connector and sent only after approval; attachments and calendar invites are downloaded with the `horus-mail` tools and imported as `documents`. The procedure is in `references/scheduling-and-email.md`. Requests that arrive through the website are turned into engagement folders by the intake watcher: the request is `inbox/request.md` (requester, organisation, country, email, scope text) with the scope document beside it, and `inbox/acknowledgement-sent.md` records the acknowledgement already emailed, if any, which the intake has also written into the state as a sent communication approved under the Supervisor's standing instruction (do not record, resend or approve it again); record the request as the inbound communication and treat the requester as the client PM until the brief says otherwise.
 
 ## 6. State protocol
 

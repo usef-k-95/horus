@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import email.utils
 import email
 import email.policy
 import imaplib
@@ -25,6 +26,7 @@ class MailSettings:
     smtp_host: str = "smtp.gmail.com"
     smtp_port: int = 465
     from_name: str = "Horus"
+    from_address: Optional[str] = None  # a verified Gmail "send as" alias; defaults to the account address
 
     @classmethod
     def load(cls) -> "MailSettings":
@@ -36,6 +38,7 @@ class MailSettings:
             smtp_host=os.getenv("HORUS_MAIL_SMTP_HOST", "smtp.gmail.com"),
             smtp_port=int(os.getenv("HORUS_MAIL_SMTP_PORT", "465")),
             from_name=os.getenv("HORUS_MAIL_FROM_NAME", "Horus"),
+            from_address=os.getenv("HORUS_MAIL_FROM_ADDRESS") or None,
         )
 
     def missing(self) -> list[str]:
@@ -178,11 +181,12 @@ class MailClient:
         if missing:
             raise RuntimeError("mail not configured: " + ", ".join(missing))
         msg = EmailMessage()
-        msg["From"] = f"{self.settings.from_name} <{self.settings.user}>"
+        msg["From"] = f"{self.settings.from_name} <{self.settings.from_address or self.settings.user}>"
         msg["To"] = ", ".join(to)
         if cc:
             msg["Cc"] = ", ".join(cc)
         msg["Subject"] = subject
+        msg["Message-ID"] = email.utils.make_msgid(domain=(self.settings.from_address or self.settings.user).split("@")[-1])
         if in_reply_to:
             msg["In-Reply-To"] = in_reply_to
             msg["References"] = in_reply_to

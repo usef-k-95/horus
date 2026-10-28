@@ -1,7 +1,12 @@
 #!/bin/sh
-# PreToolUse on any send/reply/forward tool: hold for Supervisor confirmation and show which
+# PreToolUse on any send/reply/forward tool, and on Bash running `horus-mail send`: hold for Supervisor confirmation and show which
 # communications already carry an approval, so what leaves is always seen.
 INPUT="$(cat)"
+# On Bash, only a `horus-mail send` command counts; every other command passes untouched.
+if ! printf '%s' "$INPUT" | python3 -c 'import json,re,sys
+d=json.load(sys.stdin)
+if d.get("tool_name")!="Bash": sys.exit(0)
+sys.exit(0 if re.search(r"horus-mail\s+send", (d.get("tool_input") or {}).get("command","")) else 1)'; then exit 0; fi
 WORKSPACE="${CLAUDE_PROJECT_DIR:-$PWD}"
 APPROVED=""
 if [ -f "$WORKSPACE/.horus/engagement.yaml" ]; then

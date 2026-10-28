@@ -1,7 +1,7 @@
 [project]
 name = "horus-backend"
 version = "0.0.1"
-description = "Horus backend: engagement state (horus_state) and live-meeting runtime (horus_meet)"
+description = "Horus backend: engagement state (horus_state), live-meeting runtime (horus_meet), mail, appraisal toolkit and website intake (horus_intake)"
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "Proprietary" }
@@ -27,6 +27,7 @@ horus-meet-mcp = "horus_meet.server:main"
 horus = "horus_state.cli:app"
 horus-state = "horus_state.server:main"
 horus-mail = "horus_mail.cli:app"
+horus-intake = "horus_intake.cli:app"
 
 [build-system]
 requires = ["uv_build>=0.8,<0.14"]
@@ -37,7 +38,7 @@ build-backend = "uv_build"
 link-mode = "copy"
 
 [tool.uv.build-backend]
-module-name = ["horus_meet", "horus_state", "horus_mail", "horus_appraisal"]
+module-name = ["horus_meet", "horus_state", "horus_mail", "horus_appraisal", "horus_intake"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

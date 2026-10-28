@@ -197,3 +197,10 @@ def test_all_views_render_and_search(svc):
     assert any(h["collection"] == "evidence" for h in hits)
     exported = svc.export()
     assert "evidence" in exported["collections"] and "profiles" not in exported["collections"]
+
+
+def test_date_fields_named_date_accept_dates():
+    from horus_state.models.records import Milestone, Timeline
+
+    t = Timeline(start="2026-11-01", milestones=[Milestone(name="Kickoff", date="2026-11-10")])
+    assert t.milestones[0].date.isoformat() == "2026-11-10"

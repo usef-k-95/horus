@@ -257,3 +257,97 @@ You approve sensitive outbound actions, attend and present at the client meeting
 | Engagement folder | The folder under `Horus/engagements` holding everything about one project |
 | Tier 0, 1, 2 | Deliverables for the minister, for the steering committee, and for the project team |
 | Checkpoint | The note Horus writes at the end of a session so the next one continues seamlessly |
+
+## Part F. The website and automatic intake (about 40 minutes, once)
+
+The website at horushq.ai takes a scope of work or a demo request, stores it, emails you, and the intake watcher on this Mac turns it into an engagement folder and starts Horus on it. Everything runs on Cloudflare's free plan and on this Mac; nothing is paid.
+
+### F1. Create a Cloudflare account and an API token (10 minutes)
+
+1. Go to dash.cloudflare.com/sign-up and create a free account with your email. No card is needed.
+2. Open dash.cloudflare.com/profile/api-tokens, click **Create Token**, then **Create Custom Token** (at the bottom of the page) and name it "Horus deploy".
+3. Add these permissions, one row each (click **+ Add more** for each row):
+   - Account · Workers Scripts · Edit
+   - Account · Workers KV Storage · Edit
+   - Account · Email Routing Addresses · Edit
+   - Account · Account Settings · Read
+   - Zone · Zone · Edit
+   - Zone · DNS · Edit
+   - Zone · Zone Settings · Edit
+   - Zone · Workers Routes · Edit
+   - Zone · Email Routing Rules · Edit
+4. Under **Account Resources** choose Include, your account. Under **Zone Resources** choose Include, All zones. Click **Continue to summary**, then **Create Token**, and copy the token: it is shown only once.
+
+### F2. Enter the details (2 minutes)
+
+Press Run, then click into the Terminal panel. It asks for the token (hidden), the domain (Enter for horushq.ai), the address that should receive new requests (Enter for your Gmail address) and, optionally, the account ID.
+
+```bash
+~/Horus/configure-site
+```
+
+### F3. Publish (3 minutes)
+
+```bash
+~/Horus/deploy-site
+```
+
+It adds horushq.ai to Cloudflare, uploads the site and its intake API, creates the request store and the addresses intake@horushq.ai and hello@horushq.ai, and prints what is still needed from you: the two Cloudflare nameservers to set at GoDaddy, and a verification email to click. It also prints a temporary test address ending in workers.dev where the site is live at once.
+
+### F4. Point the domain at Cloudflare (5 minutes, at GoDaddy)
+
+1. Sign in at godaddy.com, open **My Products**, find horushq.ai and click **DNS** (or **Manage DNS**).
+2. Open the **Nameservers** tab and click **Change Nameservers**.
+3. Choose **I'll use my own nameservers**, remove the GoDaddy ones and enter the two Cloudflare nameservers exactly as deploy-site printed them. Save. GoDaddy may ask you to confirm by email or by a code.
+4. Cloudflare activates the domain when it sees the change, usually within an hour and at most a day, and emails you when it is active.
+
+### F5. Verify the notification address (1 minute)
+
+Open the email Cloudflare sent to the address you gave ("Verify your email address") and click its link.
+
+### F6. Finish (1 minute)
+
+```bash
+~/Horus/deploy-site
+```
+
+Run it again once the domain is active and the address verified: it attaches horushq.ai to the site, turns on the email notifications and checks that https://horushq.ai answers. Run it after any change to the site too; it is safe to repeat.
+
+### F7. Turn on the intake watcher (3 minutes)
+
+The watcher runs on this Mac in the background and checks the site every two minutes. Horus kicks off each engagement through Claude Code's command-line tool, which must be signed in once. Press Run, then click into the Terminal panel; a browser window opens; sign in with the same account as the Claude app.
+
+```bash
+~/Horus/intake login
+```
+
+Then turn the watcher on. It stays on after a restart.
+
+```bash
+~/Horus/intake on
+```
+
+The first time, macOS asks whether **Horus Intake** may access files in your Desktop folder. Click **Allow**. Horus Intake is a small helper application that the command builds in your Horus folder: macOS lets a background job read the Desktop, where the Project Horus folder lives, only once you have allowed a named application to do so, and it remembers the answer. If no question appears and `~/Horus/intake status` says macOS is not letting Horus Intake read the project folder, allow it by hand: System Settings, Privacy & Security, Files and Folders, Horus Intake, turn on Desktop Folder (or, if it is not listed there, Full Disk Access, the + button, your home folder, Horus, Horus Intake). Then run `~/Horus/intake on` again.
+
+`~/Horus/intake off` stops it; `~/Horus/intake status` shows whether it is running, whether the site answers, and what it did last.
+
+### F8. Test it end to end (10 minutes)
+
+```bash
+~/Horus/intake test
+```
+
+This sends a fictional scope of work from "Horus test" to your own site, exactly as a client would, and processes it: a folder appears under `Horus/engagements` in your home folder (its code starts with EGY, the test's country), an acknowledgement arrives at your own address, and Horus starts the kick-off in the background. Follow it with `~/Horus/intake log`; a Mac notification tells you when the kick-off has finished. Open the folder in the Claude app as in C2 and ask what is waiting for your approval. Delete the test folder afterwards if you like. `~/Horus/intake test --demo` does the same for a demo request.
+
+### F9. What happens when a real request arrives
+
+1. Within two minutes the watcher creates the engagement folder, named `<country>-<year>-<number>-<organisation>` (or `DEMO-…` for a demo), with the request and the scope document in its inbox, and tells the website the request is taken.
+2. It emails the requester an acknowledgement, signed Horus, saying the engagement is open and the engagement plan follows within one working day (for a demo: two proposed times). It goes out from your Gmail account; see F10 to write from hello@horushq.ai instead. The engagement records it as sent, approved in your name under this standing instruction, so nothing about it waits for you. To stop these emails, set `HORUS_INTAKE_AUTO_ACK=0` in backend/.env.
+3. It starts Horus on the engagement, unattended: Horus imports and reads the scope, drafts the brief, lists its questions, creates the stakeholders, classifies the problem and chooses the pathway, starts the two profiles, and drafts the first email to the client with the questions and the kickoff proposal. Then it requests your approval and stops. Nothing leaves the folder on its own: no email, no meeting, no release. A Mac notification tells you when it has finished, usually after 20 to 40 minutes. For a demo, Horus prepares the demo plan and drafts the reply proposing two times.
+4. Open the folder in the Claude app (Code tab, new session, that folder) and say "What is waiting for my approval?" Approve, and Horus sends the email. From there the engagement runs as in Part C.
+
+If the Mac is asleep or off, requests wait at the site and are picked up when it is back; the notification email reaches you regardless. Costs: Cloudflare's free plan covers far more traffic than the site will see; each kick-off run uses your Claude subscription.
+
+### F10. Writing from hello@horushq.ai (optional, 5 minutes)
+
+Mail sent to hello@horushq.ai and intake@horushq.ai lands in your Gmail. To write from hello@horushq.ai as well: in Gmail open Settings, Accounts and Import, "Send mail as", **Add another email address**; enter Horus and hello@horushq.ai; for the SMTP server use smtp.gmail.com, port 465, your Gmail address and the app password from A2; confirm the code Gmail sends to hello@horushq.ai (it arrives in the same inbox). Then set `HORUS_MAIL_FROM_ADDRESS=hello@horushq.ai` in backend/.env, and Horus writes from that address.
