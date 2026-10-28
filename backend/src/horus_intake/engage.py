@@ -262,7 +262,16 @@ SYSTEM_APPEND = (
     "for input. A tool that is denied is unavailable in this run; work around it. Bash works only inside this folder; read files "
     "elsewhere (the plugin's references, the project docs) with Read, Glob and Grep. Nothing leaves this folder: no email, no meeting, "
     "no release. Draft what should go out, request the approval in state, and stop; the Supervisor sends approved emails from the "
-    "Claude app. Finish with validate and a checkpoint that names what waits for the Supervisor."
+    "Claude app. Run every worker in the foreground and wait for its result: the session ends when your turn ends, and background "
+    "work is lost with it. Do not end your turn before the profiles exist, validate has run and the checkpoint that names what waits "
+    "for the Supervisor is written."
+)
+
+CONTINUE_PROMPT = (
+    "Your previous turn ended while workers were still running in the background; that work was lost when the session ended, and the "
+    "engagement has no checkpoint yet. Finish Phase 0 now without redoing what is already recorded: run the remaining researcher workers "
+    "in the foreground and wait for them, create the profile records and link them to their stakeholders, re-run validate, and write the "
+    "checkpoint naming what waits for the Supervisor. Then stop."
 )
 
 
@@ -305,26 +314,29 @@ def kickoff_prompt(request: dict, code: str, ack_path: Optional[Path]) -> str:
     return head + task
 
 
-def kickoff(folder: Path, request: dict, code: str, ack_path: Optional[Path], settings: IntakeSettings) -> Optional[Path]:
-    """Start the Principal in the background and return the log path; None when the claude command is not available."""
+def kickoff(folder: Path, request: dict, code: str, ack_path: Optional[Path], settings: IntakeSettings, *, resume: Optional[str] = None, prompt: Optional[str] = None) -> Optional[Path]:
+    """Start the Principal in the background and return the log path; None when the claude command is not available.
+    With `resume`, the earlier claude session is resumed (a continuation run) and `prompt` replaces the kick-off prompt."""
     if not settings.claude_bin:
         log(f"{code}: kick-off skipped, the claude command was not found (install the Claude app or set HORUS_CLAUDE_BIN)")
         return None
     runs = folder / ".horus" / "kickoff"
     runs.mkdir(parents=True, exist_ok=True)
-    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S") + ("-continue" if resume else "")
     prompt_file = runs / f"{stamp}-prompt.md"
     system_file = runs / f"{stamp}-system.md"
     log_file = runs / f"{stamp}.jsonl"
     err_file = runs / f"{stamp}.err"
     wrapper = runs / f"{stamp}-run.sh"
-    prompt_file.write_text(kickoff_prompt(request, code, ack_path), encoding="utf-8")
+    prompt_file.write_text(prompt or kickoff_prompt(request, code, ack_path), encoding="utf-8")
     system_file.write_text(SYSTEM_APPEND, encoding="utf-8")
     cmd = [
         settings.claude_bin, "-p", "--output-format", "stream-json", "--verbose", "--max-turns", str(settings.max_turns),
         "--permission-mode", "acceptEdits", "--permission-prompts", "none", "--append-system-prompt-file", str(system_file),
         "--allowedTools", *settings.allowed_tools,
     ]
+    if resume:
+        cmd += ["--resume", resume]
     uvw = BACKEND / "uvw"
     q = shlex.quote
     script = (
@@ -344,7 +356,7 @@ def kickoff(folder: Path, request: dict, code: str, ack_path: Optional[Path], se
 
 def summarise_run(code: str, status: str, log_path: Path) -> dict:
     """Read the stream-json log of a finished kick-off: the result line, cost, turns and whether sign-in is missing."""
-    summary = {"code": code, "exit_status": status, "log": str(log_path), "result": "", "is_error": None, "num_turns": None, "cost_usd": None, "duration_s": None, "not_logged_in": False}
+    summary = {"code": code, "exit_status": status, "log": str(log_path), "result": "", "is_error": None, "num_turns": None, "cost_usd": None, "duration_s": None, "not_logged_in": False, "session_id": None}
     text = log_path.read_text(encoding="utf-8", errors="ignore") if log_path.exists() else ""
     err_path = log_path.with_suffix(".err")
     err_text = err_path.read_text(encoding="utf-8", errors="ignore") if err_path.exists() else ""
@@ -363,14 +375,52 @@ def summarise_run(code: str, status: str, log_path: Path) -> dict:
                 num_turns=event.get("num_turns"),
                 cost_usd=event.get("total_cost_usd"),
                 duration_s=round((event.get("duration_ms") or 0) / 1000),
+                session_id=event.get("session_id"),
             )
             break
+    if not summary["session_id"]:
+        for line in text.splitlines():
+            if line.startswith("{") and '"session_id"' in line:
+                try:
+                    summary["session_id"] = json.loads(line).get("session_id") or None
+                except ValueError:
+                    continue
+                if summary["session_id"]:
+                    break
     lowered = (text + err_text).lower()
     if "not logged in" in lowered or "please run /login" in lowered:
         summary["not_logged_in"] = True
     if not summary["result"] and err_text.strip():
         summary["result"] = err_text.strip()[-2000:]
     return summary
+
+
+def has_checkpoint(folder: Path) -> bool:
+    try:
+        from horus_state.service import Service
+
+        return Service(folder, actor="principal").last_checkpoint() is not None
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def latest_session_id(folder: Path) -> Optional[str]:
+    """The claude session id of the most recent kick-off run, read from its log."""
+    for log_path in sorted((folder / ".horus" / "kickoff").glob("*.jsonl"), reverse=True):
+        sid = summarise_run("", "", log_path).get("session_id")
+        if sid:
+            return sid
+    return None
+
+
+def needs_continuation(status: str, summary: dict, log_path: Path, folder: Path) -> bool:
+    """A run that ended cleanly but left no checkpoint stopped early, typically with workers still running in the background
+    (lost when the session ends). One continuation run is started; never for a run that was itself a continuation."""
+    if status != "0" or summary.get("is_error") or summary.get("not_logged_in"):
+        return False
+    if "-continue" in log_path.stem:
+        return False
+    return not has_checkpoint(folder)
 
 
 # ---- orchestration -----------------------------------------------------------------------------

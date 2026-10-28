@@ -11,7 +11,7 @@ from typing import Optional
 import typer
 
 from .client import IntakeSettings, SiteClient
-from .engage import LOG_FILE, Ledger, kickoff, log, notify_mac, process, pull, summarise_run
+from .engage import CONTINUE_PROMPT, LOG_FILE, Ledger, has_checkpoint, kickoff, latest_session_id, log, needs_continuation, notify_mac, process, pull, summarise_run
 
 app = typer.Typer(help="Horus intake: pull requests from the website, open engagements, acknowledge, kick off.", no_args_is_help=True)
 
@@ -123,7 +123,10 @@ def pull_cmd(no_kickoff: bool = typer.Option(False, "--no-kickoff", help="Create
 
 
 @app.command("kickoff")
-def kickoff_cmd(code: str = typer.Argument(..., help="Engagement code under the engagements folder")) -> None:
+def kickoff_cmd(
+    code: str = typer.Argument(..., help="Engagement code under the engagements folder"),
+    continue_: bool = typer.Option(False, "--continue", help="Resume the last run to finish what it left undone (profiles, validate, checkpoint)"),
+) -> None:
     """Start (or restart) the unattended kick-off for an engagement opened from the website."""
     settings = IntakeSettings.load()
     folder = settings.engagements_dir / code
@@ -133,7 +136,10 @@ def kickoff_cmd(code: str = typer.Argument(..., help="Engagement code under the 
         raise typer.Exit(code=2)
     request = json.loads(req_file.read_text(encoding="utf-8"))
     ack = folder / "inbox" / "acknowledgement-sent.md"
-    path = kickoff(folder, request, code, ack if ack.exists() else None, settings)
+    resume = latest_session_id(folder) if continue_ else None
+    if continue_ and not resume:
+        typer.echo("no earlier run to continue; starting a fresh kick-off")
+    path = kickoff(folder, request, code, ack if ack.exists() else None, settings, resume=resume, prompt=CONTINUE_PROMPT if resume else None)
     if not path:
         typer.echo("kick-off not started: the claude command was not found")
         raise typer.Exit(code=1)
@@ -147,15 +153,29 @@ def finished(code: str, status: str, log_path: Path) -> None:
     summary_path = log_path.with_name(log_path.stem + "-summary.md")
     first_line = (s["result"].strip().splitlines() or ["(no result text)"])[0][:200]
     summary_path.write_text(
-        f"# Kick-off run for {code}\n\n- Exit status: {status}\n- Turns: {s['num_turns']}\n- Cost (USD): {s['cost_usd']}\n- Duration (s): {s['duration_s']}\n- Error: {s['is_error']}\n- Log: {log_path}\n\n## Result\n\n{s['result'] or '(none)'}\n",
+        f"# Kick-off run for {code}\n\n- Exit status: {status}\n- Turns: {s['num_turns']}\n- Cost (USD): {s['cost_usd']}\n- Duration (s): {s['duration_s']}\n- Error: {s['is_error']}\n- Session: {s['session_id']}\n- Log: {log_path}\n\n## Result\n\n{s['result'] or '(none)'}\n",
         encoding="utf-8",
     )
     if s["not_logged_in"]:
         log(f"{code}: kick-off could not run, claude is not signed in. Run ~/Horus/intake login, then ~/Horus/intake kickoff {code}")
         notify_mac("Horus", f"Kick-off for {code} needs a sign-in: run ~/Horus/intake login, then ~/Horus/intake kickoff {code}")
         return
+    settings = IntakeSettings.load()
+    folder = settings.engagements_dir / code
+    if needs_continuation(status, s, log_path, folder):
+        req_file = folder / "inbox" / "request.json"
+        request = json.loads(req_file.read_text(encoding="utf-8")) if req_file.exists() else {}
+        ack = folder / "inbox" / "acknowledgement-sent.md"
+        path = kickoff(folder, request, code, ack if ack.exists() else None, settings, resume=s.get("session_id"), prompt=CONTINUE_PROMPT)
+        if path:
+            log(f"{code}: the run ended before its checkpoint (turns {s['num_turns']}, cost {s['cost_usd']}): {first_line}; continuation started (log {path})")
+            notify_mac("Horus", f"Kick-off for {code} stopped early; Horus is finishing it in a second run.")
+            return
     log(f"{code}: kick-off finished (exit {status}, turns {s['num_turns']}, cost {s['cost_usd']}): {first_line}")
-    notify_mac("Horus", f"Kick-off finished for {code}. Open the folder in the Claude app to see what waits for your approval.")
+    if has_checkpoint(folder):
+        notify_mac("Horus", f"Kick-off finished for {code}. Open the folder in the Claude app to see what waits for your approval.")
+    else:
+        notify_mac("Horus", f"Kick-off for {code} ended without a checkpoint. Open the folder in the Claude app and ask Horus to continue, or run ~/Horus/intake kickoff {code} --continue")
 
 
 @app.command("test-submit")

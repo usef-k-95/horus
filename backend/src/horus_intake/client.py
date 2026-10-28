@@ -22,7 +22,7 @@ DEFAULT_TOOLS = [
     "Read", "Write", "Edit", "MultiEdit", "Glob", "Grep", "LS", "WebSearch", "WebFetch", "Agent", "Task", "Skill", "TodoWrite",
     "mcp__plugin_horus_horus-state", "mcp__horus-state",
     "Bash(python3:*)", "Bash(git:*)", "Bash(curl:*)", "Bash(ls:*)", "Bash(cat:*)", "Bash(head:*)", "Bash(tail:*)", "Bash(wc:*)",
-    "Bash(file:*)", "Bash(find:*)", "Bash(grep:*)", "Bash(mkdir:*)", "Bash(cp:*)", "Bash(mv:*)",
+    "Bash(file:*)", "Bash(find:*)", "Bash(grep:*)", "Bash(mkdir:*)", "Bash(cp:*)", "Bash(mv:*)", "Bash(shasum:*)", "Bash(date:*)",
 ]
 
 

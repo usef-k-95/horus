@@ -89,9 +89,10 @@ def test_write_request_without_file(tmp_path):
 
 def test_summarise_run_reads_result_and_login_state(tmp_path):
     log = tmp_path / "run.jsonl"
-    log.write_text('{"type":"system"}\n{"type":"result","result":"Checkpoint written. Awaiting approval APV-001.","is_error":false,"num_turns":42,"total_cost_usd":1.23,"duration_ms":600000}\n')
+    log.write_text('{"type":"system","session_id":"sid-1"}\n{"type":"result","result":"Checkpoint written. Awaiting approval APV-001.","is_error":false,"num_turns":42,"total_cost_usd":1.23,"duration_ms":600000,"session_id":"sid-1"}\n')
     s = summarise_run("EGY-2026-001-finance", "0", log)
     assert s["num_turns"] == 42 and s["cost_usd"] == 1.23 and s["duration_s"] == 600 and not s["not_logged_in"] and s["result"].startswith("Checkpoint")
+    assert s["session_id"] == "sid-1"
     log.write_text('{"type":"result","result":"Not logged in · Please run /login","is_error":true}\n')
     assert summarise_run("X", "1", log)["not_logged_in"]
 
@@ -115,3 +116,34 @@ def test_record_acknowledgement_is_sent_under_standing_instruction(tmp_path, mon
     assert svc.get("approvals", com["approval"])["status"] == "approved"
     assert svc.pending_approvals() == []
     assert engage.kickoff_prompt(request, "EGY-2026-001-test", None).startswith("A new scope of work")
+
+
+def test_run_without_checkpoint_gets_one_continuation(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    from horus_intake import engage
+    from horus_state.service import Service
+
+    monkeypatch.setattr("horus_intake.engage.LOG_FILE", tmp_path / "intake.log")
+    folder = tmp_path / "EGY-2026-001-test"
+    engage.init_engagement(folder, "EGY-2026-001-test", {"organisation": "Ministry of Testing", "country": "Egypt"})
+    runs = folder / ".horus" / "kickoff"
+    runs.mkdir(parents=True)
+    (runs / "20260101-000000.jsonl").write_text('{"type":"result","result":"workers still running","is_error":false,"session_id":"sid-9"}\n', encoding="utf-8")
+    first = runs / "20260101-000000.jsonl"
+    assert engage.latest_session_id(folder) == "sid-9"
+    assert engage.needs_continuation("0", {"is_error": False}, first, folder)
+    assert not engage.needs_continuation("1", {"is_error": False}, first, folder)
+    assert not engage.needs_continuation("0", {"is_error": False}, runs / "20260101-000001-continue.jsonl", folder)
+
+    started = []
+    monkeypatch.setattr("horus_intake.engage.subprocess.Popen", lambda *a, **k: started.append(a))
+    settings = SimpleNamespace(claude_bin="/usr/bin/true", max_turns=5, allowed_tools=["Read"])
+    log_path = engage.kickoff(folder, {}, "EGY-2026-001-test", None, settings, resume="sid-9", prompt=engage.CONTINUE_PROMPT)
+    assert log_path and "-continue" in log_path.stem and started
+    wrapper = log_path.with_name(log_path.stem + "-run.sh").read_text(encoding="utf-8")
+    assert "--resume sid-9" in wrapper
+    assert log_path.with_name(log_path.stem + "-prompt.md").read_text(encoding="utf-8") == engage.CONTINUE_PROMPT
+
+    Service(folder, actor="principal").checkpoint(done=["Phase 0 complete"])
+    assert not engage.needs_continuation("0", {"is_error": False}, first, folder)
