@@ -192,6 +192,20 @@ The Terminal panel offers the same controls if you prefer them. From a session o
 
 Replace `APV-001` with the number shown. From any other folder, put the engagement code first, for example `~/Horus/horus EGY-2026-001 approvals`.
 
+**Approving and sending an email.** When the item waiting is an email (the approvals list shows a target such as `communications/COM-004`), you can approve it and send it in one step from the Terminal panel, with no Horus session open:
+
+```bash
+~/Horus/send COM-004
+```
+
+This shows what would go out and sends nothing: the approval it rides on, the recipients, the subject, whether it continues an earlier email thread, the attachments and the full text. When it reads right:
+
+```bash
+~/Horus/send COM-004 --approve
+```
+
+This records your approval under your name, sends the email from the Horus address, and marks it sent in the engagement, so Horus will not send it again. Add `--note "…"` to record a remark with your approval. For an email you already approved with `horus approve`, use `--send-only` instead of `--approve`. To turn an email down, `~/Horus/send COM-004 --reject --reason "…"` records your reason and returns the draft to Horus. Replace `COM-004` with the number shown; from any other folder, put the engagement code first, for example `~/Horus/send EGY-2026-001 COM-004`.
+
 ### C5. Watching and steering a live interview
 
 While Horus is in a meeting you can watch the live transcript and step in. Replace `MTG-003` with the meeting number Horus gave you.

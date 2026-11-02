@@ -94,6 +94,51 @@ def reject(approval_id: str, note: str = typer.Option(..., "--note"), workspace:
 
 
 @app.command()
+def send(
+    communication_id: str = typer.Argument(..., help="The outbound communication to send, for example COM-004"),
+    approve_: bool = typer.Option(False, "--approve", help="Approve the pending approval, send the email and mark it sent"),
+    note: Optional[str] = typer.Option(None, "--note", help="Note recorded with the approval"),
+    reject_: bool = typer.Option(False, "--reject", help="Reject the pending approval and return the email to draft"),
+    reason: Optional[str] = typer.Option(None, "--reason", help="Reason recorded with the rejection (required with --reject)"),
+    send_only_: bool = typer.Option(False, "--send-only", help="Send an email whose approval was already approved (horus approve)"),
+    workspace: Optional[Path] = WORKSPACE_OPT,
+    actor: Optional[str] = ACTOR_OPT,
+) -> None:
+    """Preview, approve and send a pending outbound email. Without flags nothing is sent: a dry run shows what would go out."""
+    from . import send as sending
+
+    if sum([approve_, reject_, send_only_]) > 1:
+        typer.echo("choose one of --approve, --send-only or --reject", err=True)
+        raise typer.Exit(code=2)
+    if reject_ and not (reason or "").strip():
+        typer.echo("--reject needs --reason TEXT", err=True)
+        raise typer.Exit(code=2)
+    svc = _svc(workspace, actor)
+    try:
+        prepared = sending.prepare(svc, communication_id)
+        if reject_:
+            result = sending.reject(svc, prepared, reason or "")
+            typer.echo(f"rejected {result['approval']} as {svc.actor}; {result['id']} is back to {result['status']}")
+            return
+        typer.echo(sending.render_preview(prepared, sending.from_line()))
+        if not (approve_ or send_only_):
+            typer.echo("")
+            typer.echo(f"Dry run: nothing sent. Approve and send with: horus send {communication_id} --approve [--note TEXT]. Turn it down with: --reject --reason TEXT")
+            return
+        result = sending.approve_and_send(svc, prepared, note) if approve_ else sending.send_only(svc, prepared)
+    except sending.SendError as exc:
+        typer.echo(f"error: {exc}", err=True)
+        raise typer.Exit(code=1)
+    except Exception as exc:  # rule violations, store errors, SMTP failures: say what happened, no traceback
+        typer.echo(f"error: {type(exc).__name__}: {exc}", err=True)
+        raise typer.Exit(code=1)
+    typer.echo("")
+    typer.echo(f"approved {result['approval']} as {svc.actor}" if result["approval_decided_now"] else f"approval {result['approval']} was already approved")
+    typer.echo(f"sent {result['id']} to {', '.join(result['to'])}" + (f" (cc {', '.join(result['cc'])})" if result["cc"] else "") + f" · Message-ID {result['message_id']}")
+    typer.echo(f"recorded: {result['id']} is now {result['status']}")
+
+
+@app.command()
 def gates(gate: Optional[str] = typer.Argument(None), workspace: Optional[Path] = WORKSPACE_OPT) -> None:
     """Gate checklists."""
     typer.echo(render(_svc(workspace), "gate_checklist", {"gate": gate} if gate else {}))
